@@ -1,0 +1,727 @@
+/* ================================================================ */
+    /* /nice — хаб заданий в ЛК на базе дизайн-системы главной (views2). */
+    /* Переменные дизайн-системы берём из контейнера (lp-header-views2). */
+    /* ================================================================ */
+
+    .lp-f1 .lp-nice-hero {
+        padding: 40px 20px 44px;
+        border-bottom: var(--mock-border);
+        background: transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-hero { padding: 64px 48px 60px; }
+    }
+
+    .lp-f1 .lp-nice-hero__kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--mock-accent);
+        color: var(--mock-dark);
+        padding: 8px 14px;
+        font-weight: 800;
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        border: var(--mock-border);
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        letter-spacing: 0.04em;
+    }
+    .lp-f1 .lp-nice-hero__kicker-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: var(--mock-primary);
+        border: 2px solid var(--mock-dark);
+    }
+
+    .lp-f1 .lp-nice-hero__title {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 44px;
+        line-height: 1;
+        font-weight: 800;
+        margin: 0 0 18px 0;
+        text-transform: uppercase;
+        color: var(--mock-dark);
+    }
+    .lp-f1 .lp-nice-hero__title-em {
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 700;
+        color: var(--mock-primary);
+        text-transform: uppercase;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-hero__title { font-size: 70px; }
+    }
+    @media (min-width: 1024px) {
+        .lp-f1 .lp-nice-hero__title { font-size: 86px; }
+    }
+
+    .lp-f1 .lp-nice-hero__lead {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        margin: 0 0 28px 0;
+        color: #4b5563;
+        max-width: 640px;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-hero__lead { font-size: 18px; margin-bottom: 36px; }
+    }
+
+    .lp-f1 .lp-nice-hero__stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 8px;
+    }
+    @media (min-width: 640px) {
+        .lp-f1 .lp-nice-hero__stats {
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+    }
+
+    .lp-f1 .lp-nice-hero__counter {
+        background: var(--mock-dark);
+        color: #fff;
+        border: var(--mock-border);
+        box-shadow: 6px 6px 0 var(--mock-primary);
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+    .lp-f1 .lp-nice-hero__counter-big {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 56px;
+        font-weight: 800;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -2px;
+    }
+    .lp-f1 .lp-nice-hero__counter-big small {
+        font-size: 28px;
+        color: rgba(255, 255, 255, 0.55);
+        margin-left: 4px;
+    }
+    .lp-f1 .lp-nice-hero__counter-label {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.35;
+    }
+    .lp-f1 .lp-nice-hero__counter-label strong {
+        display: block;
+        color: var(--mock-accent);
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        margin-top: 3px;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-hero__counter-big { font-size: 72px; }
+    }
+
+    .lp-f1 .lp-nice-hero__bar-wrap {
+        background: #fff;
+        border: var(--mock-border);
+        box-shadow: 6px 6px 0 var(--mock-dark);
+        padding: 18px 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+    }
+    .lp-f1 .lp-nice-hero__bar-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #4b5563;
+    }
+    .lp-f1 .lp-nice-hero__bar-label strong {
+        color: var(--mock-dark);
+        font-size: 16px;
+        font-variant-numeric: tabular-nums;
+    }
+    .lp-f1 .lp-nice-hero__bar {
+        height: 18px;
+        border: var(--mock-border);
+        background: #f3f4f6;
+        overflow: hidden;
+        position: relative;
+    }
+    .lp-f1 .lp-nice-hero__bar-fill {
+        display: block;
+        height: 100%;
+        background: repeating-linear-gradient(
+            -45deg,
+            var(--mock-primary) 0 10px,
+            #ff7632 10px 20px
+        );
+        border-right: 3px solid var(--mock-dark);
+        transition: width 0.5s ease;
+    }
+    .lp-f1 .lp-nice-hero__bar-fill--full { border-right: none; }
+
+    /* Бегущая строка — тематическая */
+    .lp-f1 .lp-nice-marquee {
+        background: var(--mock-dark);
+        color: #fff;
+        padding: 15px 0;
+        overflow: hidden;
+        border-bottom: var(--mock-border);
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-marquee { padding: 20px 0; }
+    }
+    .lp-f1 .lp-nice-marquee__track {
+        display: flex;
+        width: max-content;
+        animation: lp-nice-marquee-scroll 25s linear infinite;
+        white-space: nowrap;
+    }
+    .lp-f1 .lp-nice-marquee__segment {
+        flex-shrink: 0;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        padding-right: 2rem;
+        color: #fff;
+    }
+    .lp-f1 .lp-nice-marquee__segment em {
+        font-family: "Playfair Display", Georgia, serif;
+        font-style: italic;
+        font-weight: 700;
+        color: var(--mock-primary);
+        letter-spacing: 2px;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-marquee__segment { font-size: 22px; letter-spacing: 4px; }
+    }
+    @keyframes lp-nice-marquee-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .lp-f1 .lp-nice-marquee__track { animation: none; }
+    }
+
+    /* Секция со списком заданий */
+    .lp-f1 .lp-nice-section {
+        padding: 36px 20px;
+        border-bottom: var(--mock-border);
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-section { padding: 56px 48px; }
+    }
+    .lp-f1 .lp-nice-section__head {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px 16px;
+        margin-bottom: 24px;
+    }
+    .lp-f1 .lp-nice-section__title {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin: 0;
+        line-height: 1;
+        color: var(--mock-dark);
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-section__title { font-size: 40px; }
+    }
+    .lp-f1 .lp-nice-section__hint {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+    }
+
+    /* Сетка заданий */
+    .lp-f1 .lp-nice-quests {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .lp-f1 .lp-nice-quest {
+        background: #fff;
+        border: var(--mock-border);
+        box-shadow: 6px 6px 0 var(--mock-dark);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .lp-f1 .lp-nice-quest--done {
+        background: #fff;
+        border-color: var(--mock-dark);
+        box-shadow: 6px 6px 0 var(--mock-accent);
+    }
+    .lp-f1 .lp-nice-quest--open { box-shadow: 4px 4px 0 var(--mock-dark); }
+    .lp-f1 .lp-nice-quest--done.lp-nice-quest--open { box-shadow: 4px 4px 0 var(--mock-accent); }
+
+    .lp-f1 .lp-nice-quest__trigger {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 14px;
+        align-items: center;
+        width: 100%;
+        padding: 18px 18px;
+        margin: 0;
+        background: transparent;
+        border: none;
+        text-align: left;
+        font: inherit;
+        cursor: pointer;
+        color: inherit;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-quest__trigger { padding: 22px 24px; gap: 18px; }
+    }
+    .lp-f1 .lp-nice-quest__trigger:hover { background: #fdfdfd; }
+
+    .lp-f1 .lp-nice-quest__badge {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        border: var(--mock-border);
+        background: var(--mock-dark);
+        color: #fff;
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1;
+    }
+    .lp-f1 .lp-nice-quest--done .lp-nice-quest__badge {
+        background: var(--mock-accent);
+        color: var(--mock-dark);
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-quest__badge { width: 60px; height: 60px; font-size: 26px; }
+    }
+
+    .lp-f1 .lp-nice-quest__head {
+        min-width: 0;
+    }
+    .lp-f1 .lp-nice-quest__title {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        text-transform: uppercase;
+        line-height: 1.15;
+        margin: 0 0 4px 0;
+        color: var(--mock-dark);
+        letter-spacing: -0.01em;
+        overflow-wrap: anywhere;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-quest__title { font-size: 22px; }
+    }
+    .lp-f1 .lp-nice-quest__sub {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6b7280;
+        margin: 0;
+        line-height: 1.35;
+    }
+
+    .lp-f1 .lp-nice-quest__ratio {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    }
+    .lp-f1 .lp-nice-quest__ratio-val {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        color: var(--mock-dark);
+        line-height: 1;
+    }
+    .lp-f1 .lp-nice-quest--done .lp-nice-quest__ratio-val { color: var(--mock-primary); }
+    .lp-f1 .lp-nice-quest__chev {
+        font-size: 14px;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        transition: transform 0.18s ease;
+    }
+    .lp-f1 .lp-nice-quest__chev--open { transform: rotate(180deg); }
+
+    /* Бар прогресса мини */
+    .lp-f1 .lp-nice-quest__mini-bar {
+        grid-column: 1 / -1;
+        height: 8px;
+        border: 2px solid var(--mock-dark);
+        background: #f3f4f6;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    .lp-f1 .lp-nice-quest__mini-bar-fill {
+        display: block;
+        height: 100%;
+        background: var(--mock-primary);
+        transition: width 0.4s ease;
+    }
+    .lp-f1 .lp-nice-quest--done .lp-nice-quest__mini-bar-fill { background: var(--mock-dark); }
+
+    /* Развёрнутая панель */
+    .lp-f1 .lp-nice-quest__panel {
+        padding: 0 18px 18px;
+        border-top: 3px dashed var(--mock-dark);
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-quest__panel { padding: 0 24px 24px; }
+    }
+    .lp-f1 .lp-nice-quest__panel-inner {
+        padding-top: 18px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+    @media (min-width: 640px) {
+        .lp-f1 .lp-nice-quest__panel-inner {
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+            gap: 22px;
+        }
+    }
+
+    .lp-f1 .lp-nice-steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        counter-reset: nice-step;
+        display: grid;
+        gap: 10px;
+    }
+    .lp-f1 .lp-nice-steps li {
+        counter-increment: nice-step;
+        position: relative;
+        padding: 10px 12px 10px 48px;
+        border: 2px solid var(--mock-dark);
+        background: #fafaf4;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: #1f2937;
+    }
+    .lp-f1 .lp-nice-steps li::before {
+        content: counter(nice-step);
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--mock-primary);
+        color: #fff;
+        border: 2px solid var(--mock-dark);
+        font-weight: 800;
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1;
+    }
+
+    .lp-f1 .lp-nice-aside {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .lp-f1 .lp-nice-rewards-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    @media (min-width: 520px) {
+        .lp-f1 .lp-nice-rewards-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .lp-f1 .lp-nice-reward-box {
+        background: #fff;
+        border: var(--mock-border);
+        padding: 14px 14px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-height: 86px;
+    }
+    .lp-f1 .lp-nice-reward-box--single {
+        grid-column: 1 / -1;
+    }
+    .lp-f1 .lp-nice-reward-box__kicker {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+    }
+    .lp-f1 .lp-nice-reward-box__val {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--mock-dark);
+        line-height: 1.2;
+    }
+
+    .lp-f1 .lp-nice-feature {
+        background: var(--mock-secondary);
+        color: #fff;
+        border: var(--mock-border);
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+    }
+    .lp-f1 .lp-nice-feature__tag {
+        position: absolute;
+        top: -12px;
+        right: 12px;
+        background: var(--mock-accent);
+        color: var(--mock-dark);
+        border: var(--mock-border);
+        padding: 3px 10px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    }
+    .lp-f1 .lp-nice-feature__title {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+    .lp-f1 .lp-nice-feature__sub {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .lp-f1 .lp-nice-status {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: #4b5563;
+        margin: 0;
+        line-height: 1.4;
+    }
+    .lp-f1 .lp-nice-quest--done .lp-nice-status {
+        color: #166534;
+        font-weight: 700;
+    }
+
+    .lp-f1 .lp-nice-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 4px;
+    }
+    .lp-f1 .lp-nice-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        padding: 11px 18px;
+        border: var(--mock-border);
+        box-shadow: 4px 4px 0 var(--mock-dark);
+        background: #fff;
+        color: var(--mock-dark);
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-btn { padding: 12px 22px; font-size: 13px; }
+    }
+    .lp-f1 .lp-nice-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 var(--mock-dark);
+        color: var(--mock-dark);
+    }
+    .lp-f1 .lp-nice-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0 var(--mock-dark);
+    }
+    .lp-f1 .lp-nice-btn--primary {
+        background: var(--mock-primary);
+        color: #fff;
+    }
+    .lp-f1 .lp-nice-btn--primary:hover { color: #fff; background: var(--mock-primary); }
+    .lp-f1 .lp-nice-btn--accent {
+        background: var(--mock-accent);
+        color: var(--mock-dark);
+    }
+    .lp-f1 .lp-nice-btn--ghost {
+        background: transparent;
+        box-shadow: none;
+    }
+    .lp-f1 .lp-nice-btn--ghost:hover {
+        background: #f3f4f6;
+        box-shadow: none;
+        transform: none;
+    }
+    .lp-f1 .lp-nice-btn--done {
+        background: var(--mock-accent);
+        color: var(--mock-dark);
+        cursor: default;
+    }
+    .lp-f1 .lp-nice-btn--done:hover {
+        transform: none;
+        box-shadow: 4px 4px 0 var(--mock-dark);
+        background: var(--mock-accent);
+    }
+    .lp-f1 .lp-nice-btn--copied {
+        background: var(--mock-dark);
+        color: #fff;
+    }
+    .lp-f1 .lp-nice-btn--copied:hover { background: var(--mock-dark); color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .lp-f1 .lp-nice-btn:hover,
+        .lp-f1 .lp-nice-btn:active,
+        .lp-f1 .lp-nice-quest__chev,
+        .lp-f1 .lp-nice-quest {
+            transform: none !important;
+            transition: none !important;
+        }
+    }
+
+    /* Секция наград */
+    .lp-f1 .lp-nice-wall {
+        padding: 36px 20px;
+        border-bottom: var(--mock-border);
+        background: #fffbea;
+    }
+    @media (min-width: 768px) {
+        .lp-f1 .lp-nice-wall { padding: 56px 48px; }
+    }
+    .lp-f1 .lp-nice-wall__grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    @media (min-width: 560px) {
+        .lp-f1 .lp-nice-wall__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 900px) {
+        .lp-f1 .lp-nice-wall__grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .lp-f1 .lp-nice-wall__card {
+        background: #fff;
+        border: var(--mock-border);
+        padding: 18px 18px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 4px 4px 0 var(--mock-dark);
+    }
+    .lp-f1 .lp-nice-wall__icon {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border: var(--mock-border);
+        background: var(--mock-primary);
+        color: #fff;
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1;
+    }
+    .lp-f1 .lp-nice-wall__label {
+        font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--mock-dark);
+        margin: 0 0 3px 0;
+        line-height: 1.2;
+    }
+    .lp-f1 .lp-nice-wall__sub {
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .lp-f1 .lp-nice-wall__empty {
+        padding: 30px 20px;
+        text-align: center;
+        border: 3px dashed var(--mock-dark);
+        background: #fff;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4b5563;
+    }
+
+    /* Футер страницы nice — минималистичный */
+    .lp-f1 .lp-nice-footer {
+        padding: 24px 20px;
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px 18px;
+    }
+    .lp-f1 .lp-nice-footer a {
+        color: var(--mock-dark);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+    .lp-f1 .lp-nice-footer a:hover { color: var(--mock-primary); }
+
+    [x-cloak] { display: none !important; }

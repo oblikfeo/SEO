@@ -1,0 +1,12 @@
+{
+  "brand": "Надежда",
+  "brand_vpn": "VPN",
+  "base_url": "https://nadezhda.space",
+  "register_path": "/register",
+  "login_path": "/login",
+  "cabinet_path": "/dashboard",
+  "happ_android_apk": "/dashboard",
+  "telegram_support": "https://t.me/nadezhda_tehsup",
+  "utm_source": "seo",
+  "utm_medium": "landing"
+}

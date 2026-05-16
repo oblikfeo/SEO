@@ -1,0 +1,566 @@
+/* SEO-лендинг: блоки поверх дизайн-системы /nice (views2 + lp-header-views2) */
+
+/* ---------- Контейнер и основной отступ ---------- */
+
+.lp-f1 .lp-container {
+  max-width: 1040px;
+}
+.lp-f1 .lp-seo-main {
+  padding: 28px 22px 56px;
+  border-bottom: var(--mock-border);
+}
+@media (min-width: 768px) {
+  .lp-f1 .lp-seo-main { padding: 44px 48px 64px; }
+}
+
+/* ---------- Шапка: чтобы не «слипалось» ---------- */
+
+.lp-f1 .lp-header {
+  padding: 14px 18px;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .lp-f1 .lp-header { padding: 16px 24px; }
+}
+.lp-f1 .lp-header__bar {
+  display: flex;
+  align-items: center;
+  gap: 12px 16px;
+  width: 100%;
+  min-width: 0;
+}
+/* Бренд: не переопределять .lp-logo-vpn — стили из lp-header-views2.css (рамка, размер, оранжевый фон) */
+.lp-f1 .lp-brand-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: auto;
+  flex-shrink: 0;
+  text-decoration: none;
+  line-height: 1;
+}
+.lp-f1 .lp-brand-line .lp-logo-heavy {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+.lp-f1 .lp-brand-line .lp-logo-vpn {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.lp-f1 .lp-header__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  margin: 0;
+  padding: 0;
+}
+.lp-f1 .lp-header__nav a {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mock-dark);
+  text-decoration: none;
+  padding: 8px 10px;
+  border: 2px solid transparent;
+  line-height: 1;
+  white-space: nowrap;
+}
+.lp-f1 .lp-header__nav a:hover {
+  background: var(--mock-dark);
+  color: #fff;
+}
+.lp-f1 .lp-header__nav a.is-active {
+  background: var(--mock-accent);
+  border-color: var(--mock-dark);
+}
+
+.lp-f1 .lp-login-btn {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--mock-dark);
+  text-decoration: none;
+  padding: 9px 12px;
+  border: 2px solid var(--mock-dark);
+  background: #fff;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.lp-f1 .lp-login-btn:hover { background: var(--mock-dark); color: #fff; }
+
+.lp-f1 .lp-header-cta {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 14px;
+  background: var(--mock-primary);
+  border: 2px solid var(--mock-dark);
+  box-shadow: 3px 3px 0 var(--mock-dark);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.lp-f1 .lp-header-cta:hover {
+  background: var(--mock-dark);
+  color: #fff;
+  box-shadow: 0 0 0 var(--mock-dark);
+}
+
+/* Мобильное меню: на узких экранах nav переносится на следующую строку */
+@media (max-width: 900px) {
+  .lp-f1 .lp-header__nav { order: 5; width: 100%; padding-top: 8px; border-top: 2px dashed rgba(0,0,0,0.08); }
+  .lp-f1 .lp-header__nav a { padding: 8px 8px; font-size: 12px; }
+}
+@media (max-width: 480px) {
+  .lp-f1 .lp-header-cta { font-size: 11px; padding: 8px 10px; }
+  .lp-f1 .lp-login-btn { font-size: 11px; padding: 7px 10px; }
+  .lp-f1 .lp-logo-heavy { font-size: 22px !important; }
+}
+
+/* ---------- Хлебные крошки ---------- */
+
+.lp-f1 .lp-breadcrumbs {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 22px 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 4px;
+  color: #6b7280;
+}
+.lp-f1 .lp-breadcrumbs li { display: inline-flex; align-items: center; gap: 4px; }
+.lp-f1 .lp-breadcrumbs a {
+  color: var(--mock-dark);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+.lp-f1 .lp-breadcrumbs a:hover { border-bottom-color: var(--mock-primary); color: var(--mock-primary); }
+.lp-f1 .lp-breadcrumbs li:not(:last-child)::after {
+  content: "›";
+  margin-left: 4px;
+  color: #9ca3af;
+}
+
+/* ---------- Заголовок и Snippet-Bait ---------- */
+
+.lp-f1 .lp-seo-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--mock-accent);
+  color: var(--mock-dark);
+  padding: 8px 14px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+  border: var(--mock-border);
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}
+.lp-f1 .lp-seo-h1 {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 32px;
+  line-height: 1.05;
+  font-weight: 800;
+  margin: 0 0 18px 0;
+  text-transform: uppercase;
+  color: var(--mock-dark);
+}
+@media (min-width: 768px) { .lp-f1 .lp-seo-h1 { font-size: 44px; } }
+@media (min-width: 1024px) { .lp-f1 .lp-seo-h1 { font-size: 56px; } }
+
+.lp-f1 .lp-snippet-bait {
+  background: #fff;
+  border: var(--mock-border);
+  box-shadow: 4px 4px 0 var(--mock-primary);
+  padding: 16px 18px;
+  margin: 0 0 28px 0;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #374151;
+  max-width: 820px;
+}
+
+/* ---------- Типографика длинных текстов ---------- */
+
+.lp-f1 .lp-prose {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: #374151;
+  max-width: 820px;
+}
+.lp-f1 .lp-prose h2 {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--mock-dark);
+  margin: 32px 0 12px;
+}
+.lp-f1 .lp-prose h3 {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 22px 0 8px;
+  color: var(--mock-dark);
+  letter-spacing: 0.01em;
+}
+.lp-f1 .lp-prose p { margin: 0 0 14px; }
+.lp-f1 .lp-prose ul,
+.lp-f1 .lp-prose ol { margin: 0 0 16px; padding-left: 1.25rem; }
+.lp-f1 .lp-prose li { margin-bottom: 6px; }
+.lp-f1 .lp-prose strong { color: var(--mock-dark); }
+
+/* ---------- Таблицы ---------- */
+
+.lp-f1 .lp-table-wrap {
+  max-width: 820px;
+  overflow-x: auto;
+  margin: 18px 0 24px;
+}
+.lp-f1 .lp-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border: var(--mock-border);
+  background: #fff;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+.lp-f1 .lp-table-wrap th,
+.lp-f1 .lp-table-wrap td {
+  border: 2px solid var(--mock-dark);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.45;
+}
+.lp-f1 .lp-table-wrap th {
+  background: var(--mock-dark);
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Сетка карточек разделов ---------- */
+
+.lp-f1 .lp-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 22px 0 8px;
+}
+@media (min-width: 640px) {
+  .lp-f1 .lp-card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1000px) {
+  .lp-f1 .lp-card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+.lp-f1 .lp-hub-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border: var(--mock-border);
+  box-shadow: 5px 5px 0 var(--mock-dark);
+  padding: 18px 20px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.lp-f1 .lp-hub-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--mock-primary);
+}
+.lp-f1 .lp-hub-card__title {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  color: var(--mock-dark);
+}
+.lp-f1 .lp-hub-card__desc {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  color: #4b5563;
+}
+.lp-f1 .lp-hub-card__tag {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  background: var(--mock-accent);
+  border: 2px solid var(--mock-dark);
+  color: var(--mock-dark);
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Связанные ссылки ---------- */
+
+.lp-f1 .lp-related {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: var(--mock-border);
+  max-width: 820px;
+}
+.lp-f1 .lp-related h2 {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.lp-f1 .lp-related ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+.lp-f1 .lp-related li a {
+  display: inline-block;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--mock-dark);
+  padding: 6px 10px;
+  background: #fff;
+  border: 2px solid var(--mock-dark);
+}
+.lp-f1 .lp-related li a:hover { background: var(--mock-primary); color: #fff; }
+
+/* ---------- Trial-блок ---------- */
+
+.lp-f1 .lp-trial-block {
+  background: var(--mock-dark);
+  color: #fff;
+  border: var(--mock-border);
+  box-shadow: 6px 6px 0 var(--mock-primary);
+  padding: 22px 24px;
+  margin: 28px 0;
+  max-width: 820px;
+}
+.lp-f1 .lp-trial-block h2 {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  color: #fff;
+}
+.lp-f1 .lp-trial-block p {
+  margin: 0 0 16px;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+}
+.lp-f1 .lp-btn-primary {
+  display: inline-block;
+  background: var(--mock-primary);
+  color: #fff;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 12px 20px;
+  border: 2px solid #fff;
+  box-shadow: 4px 4px 0 #fff;
+  letter-spacing: 0.05em;
+}
+.lp-f1 .lp-btn-primary:hover {
+  background: #fff;
+  color: var(--mock-dark);
+}
+
+/* ---------- HowTo (3 шага Happ) ---------- */
+
+.lp-f1 .lp-howto {
+  background: #fff;
+  border: var(--mock-border);
+  padding: 18px 22px 20px;
+  margin: 22px 0;
+  max-width: 820px;
+}
+.lp-f1 .lp-howto__title {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+.lp-f1 .lp-howto ol {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.55;
+}
+.lp-f1 .lp-howto li { margin-bottom: 8px; }
+.lp-f1 .lp-howto a {
+  color: var(--mock-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- FAQ ---------- */
+
+.lp-f1 .lp-faq {
+  margin: 24px 0;
+  max-width: 820px;
+}
+.lp-f1 .lp-faq__title {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.lp-f1 .lp-faq details {
+  border: var(--mock-border);
+  margin-bottom: 10px;
+  background: #fff;
+}
+.lp-f1 .lp-faq summary {
+  cursor: pointer;
+  padding: 14px 16px;
+  font-weight: 700;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.lp-f1 .lp-faq summary::after {
+  content: "+";
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--mock-primary);
+}
+.lp-f1 .lp-faq details[open] summary::after { content: "−"; }
+.lp-f1 .lp-faq details[open] summary {
+  border-bottom: 2px solid var(--mock-dark);
+  background: var(--mock-accent);
+}
+.lp-f1 .lp-faq .lp-faq__a {
+  padding: 14px 16px;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #374151;
+}
+.lp-f1 .lp-faq .lp-faq__a p { margin: 0; }
+
+/* ---------- Sticky-полоса теста ---------- */
+
+.lp-f1 .lp-trial-strip {
+  background: var(--mock-accent);
+  border-top: var(--mock-border);
+  padding: 14px 22px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  color: var(--mock-dark);
+}
+.lp-f1 .lp-trial-strip a {
+  color: var(--mock-dark);
+  text-decoration: underline;
+  font-weight: 800;
+}
+.lp-f1 .lp-trial-strip a:hover { color: var(--mock-primary); }
+
+/* ---------- Футер ---------- */
+
+.lp-f1 .lp-seo-footer {
+  background: var(--mock-dark);
+  color: #fff;
+  padding: 32px 22px 22px;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+@media (min-width: 768px) {
+  .lp-f1 .lp-seo-footer { padding: 40px 48px 28px; }
+}
+.lp-f1 .lp-seo-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.lp-f1 .lp-seo-footer__col-title {
+  font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+.lp-f1 .lp-seo-footer__col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.lp-f1 .lp-seo-footer__col li { margin-bottom: 8px; font-size: 13px; line-height: 1.45; }
+.lp-f1 .lp-seo-footer__col a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.25);
+}
+.lp-f1 .lp-seo-footer__col a:hover {
+  color: var(--mock-accent);
+  border-bottom-color: var(--mock-accent);
+}
+.lp-f1 .lp-seo-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-top: 2px solid rgba(255, 255, 255, 0.12);
+  padding-top: 18px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.lp-f1 .lp-seo-footer__bottom a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
+}
+.lp-f1 .lp-seo-footer__bottom a:hover { color: var(--mock-accent); }
+
+/* ---------- Утилиты ---------- */
+
+.lp-f1 .lp-stub {
+  margin: 18px 0 8px;
+  padding: 14px 16px;
+  background: #fffbea;
+  border: var(--mock-border);
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  color: #4b5563;
+  max-width: 820px;
+}

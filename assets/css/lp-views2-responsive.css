@@ -1,0 +1,337 @@
+/* Views2 /test: стабильная мобильная вёрстка — без горизонтального «плавания» */
+    .lp-f1.lp-f1-body {
+        overflow-x: clip;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .lp-f1 .lp-container {
+        min-width: 0;
+    }
+
+    @media (max-width: 767.98px) {
+        .lp-f1 .lp-container {
+            max-width: 100%;
+            overflow-x: clip;
+        }
+    }
+
+    @media (max-width: 479.98px) {
+        .lp-f1.lp-f1-body {
+            padding-left: max(0.5rem, env(safe-area-inset-left));
+            padding-right: max(0.5rem, env(safe-area-inset-right));
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .lp-f1 #features,
+        .lp-f1 #support,
+        .lp-f1 #tarify {
+            scroll-margin-top: min(130px, 28vh);
+        }
+
+        /* Шапка: три полоски + выпадающее меню (навигация не влазит в строку) */
+        .lp-f1 .lp-header.lp-header-v2 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .lp-f1 .lp-header--drawer .lp-header__bar {
+            flex-wrap: wrap;
+            align-items: center;
+            row-gap: 0.35rem;
+        }
+
+        .lp-f1 .lp-brand-line {
+            flex: 1 1 auto;
+            min-width: 0;
+            justify-content: flex-start;
+        }
+
+        .lp-f1 .lp-logo-heavy {
+            font-size: clamp(1.125rem, 5.5vw, 1.5rem);
+        }
+
+        .lp-f1 .lp-nav-toggle {
+            display: inline-flex;
+            order: 2;
+        }
+
+        .lp-f1 .lp-header--drawer .lp-header-cta {
+            order: 3;
+            margin-left: auto;
+            width: auto;
+            max-width: none;
+            flex-shrink: 0;
+        }
+
+        .lp-f1 .lp-header__nav {
+            display: none;
+            order: 10;
+            flex-basis: 100%;
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: 0;
+            flex: none;
+            padding: 0.35rem 0 0;
+            margin: 0;
+            border-top: var(--mock-border);
+            background: #fff;
+        }
+
+        .lp-f1 .lp-header__nav.lp-header__nav--open {
+            display: flex;
+        }
+
+        .lp-f1 .lp-header__nav a {
+            padding: 0.7rem 0.35rem;
+            font-size: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(26, 26, 26, 0.12);
+        }
+
+        .lp-f1 .lp-header__nav a:last-child {
+            border-bottom: none;
+        }
+
+        /* Hero: без лишней высоты; синий стикер — абсолютно в правом верхнем углу блока */
+        .lp-f1 section.hero {
+            min-height: 0;
+            position: relative;
+        }
+
+        .lp-f1 .hero-content {
+            padding: 1.25rem clamp(5.75rem, 28vw, 7.5rem) 1.25rem 0.875rem;
+            min-width: 0;
+        }
+
+        .lp-f1 .hero-title {
+            font-size: clamp(1.65rem, 10vw, 2.85rem);
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .lp-f1 .hero-description {
+            overflow-wrap: anywhere;
+        }
+
+        .lp-f1 .hero-img {
+            display: flex !important;
+            position: absolute;
+            top: 0.5rem;
+            right: max(0.625rem, env(safe-area-inset-right));
+            width: auto;
+            min-height: 0;
+            align-items: flex-start;
+            justify-content: flex-end;
+            background: transparent;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .lp-f1 .hero-img .sticker {
+            position: relative;
+            top: 0;
+            right: auto;
+            bottom: auto;
+            transform: rotate(15deg);
+        }
+
+        /* Бегущая строка: меньше трекинг на узком экране */
+        .lp-f1 .marquee-segment {
+            font-size: 0.8125rem;
+            letter-spacing: 0.08em;
+            padding-right: 1rem;
+        }
+
+        /* Features */
+        .lp-f1 .lp-features-section.section-padding {
+            padding-left: 0.875rem;
+            padding-right: 0.875rem;
+        }
+
+        .lp-f1 .lp-features-section .section-title {
+            font-size: clamp(1.65rem, 9vw, 2.5rem);
+            margin-bottom: 1.125rem;
+        }
+
+        .lp-f1 .lp-features-section .about-text {
+            margin-bottom: 2rem;
+            overflow-wrap: anywhere;
+        }
+
+        /* Тарифы */
+        .lp-f1 .lp-pricing.lp-pricing-mock {
+            padding-left: 0.875rem;
+            padding-right: 0.875rem;
+            padding-top: 1.75rem;
+            padding-bottom: 1.75rem;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .lp-pricing-head-mock {
+            margin-bottom: 1.5rem;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .lp-section-title {
+            font-size: clamp(1.45rem, 7.5vw, 2.25rem);
+            overflow-wrap: anywhere;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-column-title {
+            font-size: clamp(1rem, 4.5vw, 1.35rem);
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-column-hint {
+            font-size: 0.875rem;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-card {
+            padding: 1rem 0.75rem;
+            min-width: 0;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-price {
+            font-size: clamp(1.65rem, 8vw, 2.25rem);
+            overflow-wrap: anywhere;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-tag {
+            max-width: calc(100% - 1rem);
+            white-space: normal;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .lp-pricing-guarantees .lp-payment-info {
+            font-size: 0.8125rem;
+            line-height: 1.65;
+        }
+
+        /* Поддержка */
+        .lp-f1 .lp-support-section-mock.section-padding {
+            padding-left: 0.875rem;
+            padding-right: 0.875rem;
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+
+        .lp-f1 .lp-support-section-mock .section-title {
+            font-size: clamp(1.45rem, 7.5vw, 2.25rem);
+        }
+
+        .lp-f1 .lp-support-section-mock .support-text {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .lp-f1 .lp-support-section-mock .support-time {
+            font-size: clamp(1.45rem, 8vw, 2rem);
+        }
+
+        .lp-f1 .lp-support-section-mock .support-badge {
+            padding: 1rem 1.25rem;
+            max-width: 100%;
+        }
+
+        .lp-f1 .lp-support-section-mock .btn-cta.lp-support-tg-btn {
+            width: 100%;
+            max-width: 22rem;
+            justify-content: center;
+        }
+
+        /* Футер */
+        .lp-f1 .lp-footer-mock {
+            padding-left: 0.875rem;
+            padding-right: 0.875rem;
+            gap: 1.75rem;
+        }
+
+        .lp-f1 .lp-footer-mock .footer-logo {
+            font-size: clamp(1.35rem, 7vw, 2rem);
+            overflow-wrap: anywhere;
+        }
+
+        .lp-f1 .lp-footer-mock .footer-description {
+            overflow-wrap: anywhere;
+        }
+    }
+
+    /* Шапка на очень узком экране: чуть плотнее, но читаемо (перебивает правила выше) */
+    @media (max-width: 450px) {
+        .lp-f1 .lp-header.lp-header-v2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .lp-f1 .lp-header--drawer .lp-header__bar {
+            gap: 0.35rem 0.5rem;
+        }
+
+        .lp-f1 .lp-brand-line {
+            gap: 0.32rem;
+        }
+
+        .lp-f1 .lp-logo-heavy {
+            font-size: clamp(0.875rem, 4.2vw, 1.0625rem);
+            letter-spacing: -0.04em;
+        }
+
+        .lp-f1 .lp-logo-vpn {
+            font-size: 0.625rem;
+            padding: 0.06rem 0.28rem;
+            border-width: 2px;
+        }
+
+        .lp-f1 .lp-nav-toggle {
+            width: 40px;
+            height: 40px;
+            border-width: 2px;
+        }
+
+        .lp-f1 .lp-nav-toggle__bars {
+            width: 18px;
+            height: 2px;
+            box-shadow: 0 -6px 0 var(--lp-ink), 0 6px 0 var(--lp-ink);
+        }
+
+        .lp-f1 .lp-header--drawer .lp-header-cta {
+            padding: 7px 10px;
+            font-size: 0.6875rem;
+            border-width: 2px;
+            box-shadow: 3px 3px 0 var(--lp-ink);
+            letter-spacing: 0.035em;
+            line-height: 1.2;
+        }
+
+        .lp-f1 .lp-header--drawer .lp-header-cta:hover {
+            box-shadow: 4px 4px 0 var(--lp-ink);
+        }
+
+        .lp-f1 .lp-header__nav a {
+            font-size: 0.75rem;
+            padding: 0.6rem 0.35rem;
+        }
+    }
+
+    /* Hover-тени только там, где есть настоящий hover (меньше артефактов на таче) */
+    @media (max-width: 767.98px) {
+        .lp-f1 .lp-features-section .feature-card:hover,
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-card:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    @media (hover: hover) and (max-width: 767.98px) {
+        .lp-f1 .lp-features-section .feature-card:hover {
+            box-shadow: var(--mock-shadow);
+            transform: translate(-4px, -4px);
+        }
+
+        .lp-f1 .lp-pricing.lp-pricing-mock .pricing-card:hover {
+            box-shadow: var(--mock-shadow);
+            transform: translate(-3px, -3px);
+        }
+    }

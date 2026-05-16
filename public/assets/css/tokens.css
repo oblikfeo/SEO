@@ -1,0 +1,18 @@
+/* Дизайн-токены /nice + views2 (lp-header-views2) */
+.lp-f1 {
+  --lp-ink: #111;
+  --lp-orange: #ff4500;
+  --lp-bg: #f4f4f4;
+  --lp-mock-accent: #bff000;
+}
+
+.lp-f1 .lp-container {
+  --mock-primary: #ff4d00;
+  --mock-dark: #1a1a1a;
+  --mock-accent: #bff000;
+  --mock-secondary: #2d31fa;
+  --mock-border: 3px solid #1a1a1a;
+  --mock-shadow: 8px 8px 0 var(--mock-dark);
+  background-color: #fdf9f0;
+  max-width: 960px;
+}
