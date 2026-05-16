@@ -5,3 +5,6 @@ __pycache__/
 .venv/
 *.log
 .DS_Store
+
+# локальный помощник деплоя (без секретов)
+scripts/_remote_deploy_runner.py
