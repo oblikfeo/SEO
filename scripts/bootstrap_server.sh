@@ -23,10 +23,20 @@ fi
 chown -R www-data:www-data "$INSTALL_ROOT/public"
 
 cat >/etc/nginx/sites-available/seo-static <<'NGINX'
+# Порт TCP 443 на этом узле занят под Xray (VLESS Reality) — общедоступный HTTPS для лендинга
+# включают через CDN (Cloudflare/Nginx proxy) поверх этого HTTP :80 или отделяют второй вход.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name www.nadezhda.info;
+    return 301 https://nadezhda.info$request_uri;
+}
+
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    server_name _;
+    server_name nadezhda.info _;
+
     root /var/www/seo/public;
     index index.html;
 
@@ -36,6 +46,9 @@ server {
 
     gzip on;
     gzip_types text/css application/javascript application/json image/svg+xml;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }
 NGINX
 
