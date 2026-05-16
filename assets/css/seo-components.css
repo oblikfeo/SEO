@@ -170,6 +170,11 @@
   font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   letter-spacing: 0.04em;
 }
+
+.lp-f1 .lp-seo-h1-accent {
+  color: var(--mock-primary);
+}
+
 .lp-f1 .lp-seo-h1 {
   font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
   font-size: 32px;

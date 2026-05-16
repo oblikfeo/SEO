@@ -38,8 +38,11 @@ GitHub и VPS (репозиторий SEO)
   cd /var/www && git clone https://github.com/oblikfeo/SEO.git seo && cd seo
   bash scripts/bootstrap_server.sh
 
-Обновление после push в main:
-  cd /var/www/seo && git pull origin main && bash scripts/bootstrap_server.sh
+Обновление после push в main (быстро, без apt):
+  cd /var/www/seo && git pull origin main && bash scripts/pull_and_reload.sh
+
+Полная переустановка конфигура nginx (редко):
+  cd /var/www/seo && bash scripts/bootstrap_server.sh
 
 Корень сайта для nginx: public/ (отдаётся как статика).
 Пароли SSH не храните в репозитории; для прод-доступа лучше ключ и отключить вход по паролю.

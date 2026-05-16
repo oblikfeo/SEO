@@ -411,7 +411,11 @@ def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict],
     parts: list[str] = []
     if kicker:
         parts.append(f'<span class="lp-seo-kicker">{attr(kicker)}</span>')
-    parts.append(f'<h1 class="lp-seo-h1">{attr(content["h1"])}</h1>')
+    h1_html = content.get("h1_html")
+    if h1_html:
+        parts.append(f'<h1 class="lp-seo-h1">{h1_html}</h1>')
+    else:
+        parts.append(f'<h1 class="lp-seo-h1">{attr(content["h1"])}</h1>')
 
     card_modifier = "lp-card-grid--3" if page.get("kind") in ("home", "silo", "hub") else ""
     body, extras = render_sections(content["sections"], cfg, depth, slug, card_modifier)
