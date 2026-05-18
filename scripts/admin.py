@@ -189,70 +189,330 @@ def esc(s: str) -> str:
 def layout(title: str, body: str, flash: str = "") -> str:
     flash_html = f'<div class="flash">{flash}</div>' if flash else ""
     return f"""<!doctype html>
-<html lang="ru"><head><meta charset="utf-8">
-<title>{esc(title)} — Админка SEO</title>
+<html lang="ru"><head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex,nofollow">
+<title>{esc(title)} — Админка SEO</title>
 <style>
-:root {{ color-scheme: light dark; }}
+:root {{
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #f8f9fb;
+  --border: #e3e6eb;
+  --border-strong: #c9cfd6;
+  --text: #1f2430;
+  --text-muted: #5a6472;
+  --text-soft: #8a93a1;
+  --primary: #2563eb;
+  --primary-strong: #1d4ed8;
+  --danger: #dc2626;
+  --danger-strong: #b91c1c;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --radius: 10px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --shadow: 0 4px 14px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+}}
+
 * {{ box-sizing: border-box; }}
-body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-       margin: 0; padding: 24px; max-width: 1100px; line-height: 1.45; color: #111; background: #fafafa; }}
-h1 {{ margin: 0 0 18px; font-size: 22px; }}
-h2 {{ margin: 24px 0 12px; font-size: 16px; }}
-a {{ color: #0a58ca; text-decoration: none; }}
+
+html, body {{
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}}
+
+body {{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}}
+
+.topbar {{
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}}
+.topbar .brand {{
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}}
+.topbar .brand-sub {{
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-left: 6px;
+}}
+.topbar nav {{
+  display: flex;
+  gap: 18px;
+  margin-left: auto;
+  font-size: 14px;
+}}
+.topbar a {{
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+}}
+.topbar a:hover {{ color: var(--primary); }}
+
+.container {{
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px;
+}}
+
+h1 {{
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}}
+h2 {{ font-size: 16px; margin: 24px 0 10px; color: var(--text); }}
+.page-meta {{
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0 0 22px;
+}}
+
+a {{ color: var(--primary); text-decoration: none; }}
 a:hover {{ text-decoration: underline; }}
-nav.top {{ margin-bottom: 18px; font-size: 14px; color: #666; }}
-nav.top a {{ margin-right: 12px; }}
-table.list {{ width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.05); border-radius: 8px; overflow: hidden; }}
-table.list th, table.list td {{ padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; font-size: 14px; }}
-table.list th {{ background: #f1f3f5; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: #555; }}
-table.list tr:last-child td {{ border-bottom: 0; }}
-table.list tr.ov td {{ background: #fff7e6; }}
-.path {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; color: #333; }}
-.kind {{ display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e9ecef; color: #495057; margin-left: 6px; }}
-.kind.home {{ background: #d0ebff; color: #1864ab; }}
-.kind.silo {{ background: #d3f9d8; color: #2b8a3e; }}
-.kind.hub {{ background: #fff3bf; color: #8a6d00; }}
-.kind.leaf {{ background: #ffe3e3; color: #c92a2a; }}
-.kind.sub {{ background: #f3d9fa; color: #862e9c; }}
-.flag-ov {{ display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #fab005; color: #fff; margin-left: 6px; }}
-.flash {{ padding: 12px 14px; margin-bottom: 16px; background: #d3f9d8; color: #2b8a3e; border-radius: 6px; font-size: 14px; }}
-form.edit {{ background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.05); max-width: 720px; }}
-form.edit .row {{ margin-bottom: 18px; }}
-form.edit label {{ display: block; font-weight: 600; margin-bottom: 6px; font-size: 13px; }}
-form.edit input[type=text], form.edit textarea {{ width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid #ced4da; border-radius: 6px; font-family: inherit; }}
-form.edit textarea {{ min-height: 80px; resize: vertical; }}
-form.edit .hint {{ font-size: 12px; color: #666; margin-top: 4px; }}
-form.edit .default {{ font-size: 12px; color: #888; margin-top: 6px; padding: 8px 10px; background: #f8f9fa; border-radius: 4px; word-break: break-word; }}
-form.edit .default b {{ color: #555; }}
-form.edit .actions {{ display: flex; gap: 12px; margin-top: 20px; }}
-button {{ font-size: 14px; padding: 9px 16px; border: 0; border-radius: 6px; cursor: pointer; }}
-button.primary {{ background: #228be6; color: #fff; }}
-button.primary:hover {{ background: #1c7ed6; }}
-button.danger {{ background: #fa5252; color: #fff; }}
-button.danger:hover {{ background: #e03131; }}
-button.ghost {{ background: #e9ecef; color: #333; }}
-.code {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: #f1f3f5; padding: 1px 4px; border-radius: 3px; }}
-@media (prefers-color-scheme: dark) {{
-  body {{ background: #1a1b1e; color: #e9ecef; }}
-  table.list, form.edit {{ background: #25262b; box-shadow: 0 1px 3px rgba(0,0,0,.3); }}
-  table.list th {{ background: #2c2e33; color: #adb5bd; }}
-  table.list th, table.list td {{ border-bottom-color: #373a40; }}
-  table.list tr.ov td {{ background: #3a2f12; }}
-  form.edit input[type=text], form.edit textarea {{ background: #1a1b1e; color: #e9ecef; border-color: #495057; }}
-  form.edit .default {{ background: #2c2e33; color: #adb5bd; }}
-  .kind {{ background: #373a40; color: #ced4da; }}
-  a {{ color: #74c0fc; }}
-  .flash {{ background: #1f3a23; color: #b2f2bb; }}
+
+.flash {{
+  padding: 12px 16px;
+  margin: 0 0 20px;
+  background: var(--success-soft);
+  color: #14532d;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius);
+  font-size: 14px;
+}}
+.flash.error {{
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-color: #fecaca;
+  white-space: pre-wrap;
+  font-family: var(--mono);
+  font-size: 12px;
+}}
+
+/* ---- Таблица ---- */
+.card {{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}}
+
+table.list {{
+  width: 100%;
+  border-collapse: collapse;
+}}
+table.list th,
+table.list td {{
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}}
+table.list thead th {{
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}}
+table.list tbody tr:last-child td {{ border-bottom: 0; }}
+table.list tbody tr:hover td {{ background: var(--surface-2); }}
+table.list tr.ov td {{ background: #fffaf0; }}
+table.list tr.ov:hover td {{ background: #fff5e0; }}
+table.list td.col-actions {{
+  text-align: right;
+  white-space: nowrap;
+  width: 1%;
+}}
+table.list td .truncate {{
+  display: block;
+  max-width: 460px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}}
+table.list td .truncate.muted {{ color: var(--text-muted); }}
+
+.path {{
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}}
+
+.badge {{
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-left: 6px;
+  border: 1px solid transparent;
+  vertical-align: middle;
+  line-height: 1.5;
+}}
+.badge.home    {{ background: #dbeafe; color: #1d4ed8; }}
+.badge.silo    {{ background: #dcfce7; color: #15803d; }}
+.badge.hub     {{ background: #fef9c3; color: #854d0e; }}
+.badge.leaf    {{ background: #fee2e2; color: #b91c1c; }}
+.badge.sub     {{ background: #ede9fe; color: #6d28d9; }}
+.badge.override {{
+  background: var(--warning-soft);
+  color: var(--warning);
+  border-color: #fcd34d;
+}}
+
+/* ---- Кнопки/ссылки в действиях ---- */
+.btn {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}}
+.btn:hover {{ text-decoration: none; }}
+.btn-primary {{ background: var(--primary); color: #fff; }}
+.btn-primary:hover {{ background: var(--primary-strong); }}
+.btn-ghost {{ background: var(--surface); color: var(--text); border-color: var(--border-strong); }}
+.btn-ghost:hover {{ background: var(--surface-2); }}
+.btn-danger {{ background: var(--surface); color: var(--danger); border-color: #fecaca; }}
+.btn-danger:hover {{ background: #fee2e2; color: var(--danger-strong); }}
+.btn-link {{
+  background: transparent;
+  color: var(--primary);
+  border: 0;
+  padding: 6px 8px;
+  font-weight: 600;
+}}
+.btn-link:hover {{ color: var(--primary-strong); }}
+.btn-sm {{ font-size: 13px; padding: 6px 12px; }}
+
+/* ---- Форма ---- */
+.editor {{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 28px;
+  max-width: 820px;
+}}
+.editor .field {{ margin-bottom: 22px; }}
+.editor label {{
+  display: block;
+  font-weight: 600;
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--text);
+}}
+.editor input[type=text],
+.editor textarea {{
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  line-height: 1.4;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}}
+.editor input[type=text]:focus,
+.editor textarea:focus {{
+  outline: 0;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}}
+.editor textarea {{ min-height: 90px; resize: vertical; }}
+.editor .hint {{ font-size: 12px; color: var(--text-muted); margin-top: 6px; }}
+.editor .default {{
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  word-break: break-word;
+  line-height: 1.5;
+}}
+.editor .default b {{ color: var(--text); font-weight: 600; }}
+.editor .actions {{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}}
+.editor .actions .spacer {{ flex: 1; }}
+
+.subtitle {{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}}
+.subtitle .path {{ font-size: 13px; }}
+
+@media (max-width: 720px) {{
+  .container {{ padding: 18px; }}
+  .topbar {{ padding: 12px 18px; }}
+  table.list td .truncate {{ max-width: 220px; }}
+  .editor {{ padding: 20px; }}
 }}
 </style></head><body>
-<nav class="top">
-  <a href="/">← Список страниц</a>
-  <span style="color:#999">|</span>
-  <a href="https://nadezhda.info/" target="_blank" rel="noopener">Открыть сайт ↗</a>
-</nav>
+<header class="topbar">
+  <span class="brand">SEO админка<span class="brand-sub">· Надежда VPN</span></span>
+  <nav>
+    <a href="{url_for('index')}">Страницы</a>
+    <a href="https://nadezhda.info/" target="_blank" rel="noopener">Открыть сайт ↗</a>
+  </nav>
+</header>
+<main class="container">
 {flash_html}
 {body}
+</main>
 </body></html>"""
 
 
@@ -278,34 +538,35 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
 
     rows_html = []
     for r in rows:
-        ov_flag = '<span class="flag-ov">override</span>' if r["overridden"] else ""
+        ov_badge = '<span class="badge override">правки</span>' if r["overridden"] else ""
         cls = ' class="ov"' if r["overridden"] else ""
         rows_html.append(
             f'<tr{cls}>'
             f'<td><span class="path">{esc(r["path"])}</span>'
-            f'<span class="kind {esc(r["kind"])}">{esc(page_kind_label(r["kind"]))}</span>{ov_flag}</td>'
-            f'<td>{esc(r["h1"])}</td>'
-            f'<td>{esc(r["title"])}</td>'
-            f'<td style="text-align:right; white-space:nowrap">'
-            f'<a href="{url_for("edit", path=r["path"])}">Редактировать</a></td>'
+            f'<span class="badge {esc(r["kind"])}">{esc(page_kind_label(r["kind"]))}</span>{ov_badge}</td>'
+            f'<td><span class="truncate">{esc(r["h1"])}</span></td>'
+            f'<td><span class="truncate muted">{esc(r["title"])}</span></td>'
+            f'<td class="col-actions">'
+            f'<a class="btn btn-ghost btn-sm" href="{url_for("edit", path=r["path"])}">Редактировать</a></td>'
             f'</tr>'
         )
 
     flash = ""
     if saved:
-        flash = f"Сохранено и пересобрано: <span class='code'>{esc(saved)}</span>"
+        flash = f'Сохранено и опубликовано: <span class="path">{esc(saved)}</span>'
     elif reset:
-        flash = f"Сброшено к дефолту: <span class='code'>{esc(reset)}</span>"
+        flash = f'Сброшено к дефолту: <span class="path">{esc(reset)}</span>'
 
     total = len(rows)
     overridden_n = sum(1 for r in rows if r["overridden"])
     body = (
         f'<h1>SEO-страницы лендинга</h1>'
-        f'<p style="font-size:14px;color:#666;margin:-8px 0 16px">Всего: {total} · с правками: {overridden_n}</p>'
+        f'<p class="page-meta">Всего страниц: <b>{total}</b> · с переопределённым SEO: <b>{overridden_n}</b></p>'
+        f'<div class="card">'
         f'<table class="list">'
-        f'<thead><tr><th>Путь</th><th>H1</th><th>Title</th><th></th></tr></thead>'
+        f'<thead><tr><th style="width:30%">Путь</th><th>H1</th><th>Title</th><th></th></tr></thead>'
         f'<tbody>' + "".join(rows_html) + '</tbody>'
-        f'</table>'
+        f'</table></div>'
     )
     return layout("SEO-страницы", body, flash)
 
@@ -324,44 +585,46 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
             f'onsubmit="return confirm(\'Сбросить все правки этой страницы к дефолту?\');" '
             f'style="display:inline">'
             f'<input type="hidden" name="path" value="{esc(path)}">'
-            f'<button type="submit" class="danger">Сбросить к дефолту</button>'
+            f'<button type="submit" class="btn btn-danger">Сбросить к дефолту</button>'
             f'</form>'
         )
 
-    error_html = f'<div class="flash" style="background:#ffc9c9;color:#c92a2a">{esc(error)}</div>' if error else ""
+    error_html = f'<div class="flash error">{esc(error)}</div>' if error else ""
 
     body = f"""
-<h1>Страница <span class="code">{esc(path)}</span>
-  <span class="kind {esc(page['kind'])}">{esc(page_kind_label(page['kind']))}</span>
-</h1>
+<h1>Редактирование SEO</h1>
+<div class="subtitle">
+  <span class="path">{esc(path)}</span>
+  <span class="badge {esc(page['kind'])}">{esc(page_kind_label(page['kind']))}</span>
+</div>
 {error_html}
-<form method="post" action="{url_for('save')}" class="edit">
+<form method="post" action="{url_for('save')}" class="editor">
   <input type="hidden" name="path" value="{esc(path)}">
 
-  <div class="row">
-    <label for="h1">H1 (заголовок страницы)</label>
-    <input type="text" id="h1" name="h1" value="{esc(ov_h1)}" placeholder="Оставьте пустым, чтобы использовать дефолт">
+  <div class="field">
+    <label for="h1">H1 — заголовок на странице</label>
+    <input type="text" id="h1" name="h1" value="{esc(ov_h1)}" placeholder="Оставьте пустым, чтобы использовать дефолт" autocomplete="off">
     <div class="default"><b>Дефолт:</b> {esc(seo['h1'])}</div>
   </div>
 
-  <div class="row">
-    <label for="title">Title (вкладка браузера и поисковая выдача)</label>
-    <input type="text" id="title" name="title" value="{esc(ov_title)}" placeholder="Оставьте пустым, чтобы использовать дефолт">
+  <div class="field">
+    <label for="title">Title — вкладка браузера и поисковая выдача</label>
+    <input type="text" id="title" name="title" value="{esc(ov_title)}" placeholder="Оставьте пустым, чтобы использовать дефолт" autocomplete="off">
     <div class="hint">Рекомендуется 50–60 символов.</div>
     <div class="default"><b>Дефолт:</b> {esc(seo['title'])}</div>
   </div>
 
-  <div class="row">
-    <label for="description">Meta description (сниппет в поиске)</label>
+  <div class="field">
+    <label for="description">Meta description — сниппет в поиске</label>
     <textarea id="description" name="description" placeholder="Оставьте пустым, чтобы использовать дефолт">{esc(ov_desc)}</textarea>
     <div class="hint">Рекомендуется 140–160 символов.</div>
     <div class="default"><b>Дефолт:</b> {esc(seo['description'])}</div>
   </div>
 
   <div class="actions">
-    <button type="submit" class="primary">Сохранить и опубликовать</button>
-    <a href="{url_for('index')}"><button type="button" class="ghost">Отмена</button></a>
-    <span style="flex:1"></span>
+    <button type="submit" class="btn btn-primary">Сохранить и опубликовать</button>
+    <a class="btn btn-ghost" href="{url_for('index')}">Отмена</a>
+    <span class="spacer"></span>
     {reset_form}
   </div>
 </form>

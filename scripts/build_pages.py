@@ -575,6 +575,40 @@ def render_stub(
 # ---------- Page shell ----------
 
 
+def yandex_verification_meta(cfg: dict) -> str:
+    token = (cfg.get("yandex_verification") or "").strip()
+    if not token:
+        return ""
+    return f'<meta name="yandex-verification" content="{attr(token)}">\n'
+
+
+def yandex_metrika_snippet(cfg: dict) -> tuple[str, str]:
+    """Возвращает (head_script, body_noscript) для Яндекс.Метрики."""
+    counter_id = cfg.get("yandex_metrika_id")
+    if not counter_id:
+        return "", ""
+    cid = str(counter_id)
+    head = (
+        "<!-- Yandex.Metrika counter -->\n"
+        '<script type="text/javascript">\n'
+        "   (function(m,e,t,r,i,k,a){\n"
+        "       m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};\n"
+        "       m[i].l=1*new Date();\n"
+        "       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}\n"
+        "       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)\n"
+        "   })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=" + cid + "', 'ym');\n"
+        "\n"
+        "   ym(" + cid + ", 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:\"dataLayer\", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});\n"
+        "</script>\n"
+        "<!-- /Yandex.Metrika counter -->\n"
+    )
+    noscript = (
+        "<noscript><div><img src=\"https://mc.yandex.ru/watch/" + cid + "\" "
+        "style=\"position:absolute; left:-9999px;\" alt=\"\" /></div></noscript>\n"
+    )
+    return head, noscript
+
+
 def page_shell(
     cfg: dict,
     *,
@@ -593,6 +627,8 @@ def page_shell(
     crumbs_with_href = [(n, p) for n, p in crumbs if p]
     bc_ld = breadcrumbs_ld(cfg, crumbs_with_href) if crumbs_with_href else ""
     schemas_html = "\n".join(json_ld(s) for s in extras_ld)
+    yv_meta = yandex_verification_meta(cfg)
+    ym_head, ym_noscript = yandex_metrika_snippet(cfg)
     return (
         "<!DOCTYPE html>\n"
         '<html lang="ru">\n<head>\n'
@@ -602,6 +638,7 @@ def page_shell(
         f'<meta name="description" content="{attr(description)}">\n'
         f'<link rel="canonical" href="{attr(canon)}">\n'
         '<meta name="robots" content="index,follow">\n'
+        f"{yv_meta}"
         '<meta property="og:type" content="website">\n'
         f'<meta property="og:title" content="{attr(title)}">\n'
         f'<meta property="og:description" content="{attr(description)}">\n'
@@ -613,8 +650,10 @@ def page_shell(
         f"{css_links}\n"
         f"{bc_ld}\n"
         f"{schemas_html}\n"
+        f"{ym_head}"
         "</head>\n<body>\n"
-        '<div class="lp-f1 lp-f1-body"><div class="lp-container">'
+        + ym_noscript
+        + '<div class="lp-f1 lp-f1-body"><div class="lp-container">'
         + header_html(cfg, depth, active_silo)
         + '<main class="lp-seo-main">'
         + breadcrumbs_html_block(crumbs, depth)
