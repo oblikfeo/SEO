@@ -44,6 +44,14 @@ from site_data import (  # noqa: E402
     build_pages_list,
 )
 
+# Фиксированные ключи шагов HowTo (сейчас в build_pages.py распознаются только эти).
+HOWTO_KEYS = ["registration", "apk", "import"]
+HOWTO_KEY_HINT = {
+    "registration": "ссылка ведёт на «Регистрация в Личном Кабинете»",
+    "apk": "ссылка ведёт на «Скачать Happ (APK)»",
+    "import": "ссылка ведёт на «Импорт ссылки подписки в Happ»",
+}
+
 ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin")
 ADMIN_BIND = os.environ.get("ADMIN_BIND", "127.0.0.1")
@@ -159,6 +167,387 @@ def find_page(path: str) -> dict | None:
         if p["path"] == path:
             return p
     return None
+
+
+# ---------- Контент-блоки: дефолты, нормализация, конверсия ----------
+
+def section_tuple_to_dict(sec) -> dict:
+    """Преобразует кортеж секции из site_data.py в редактируемый dict."""
+    t = sec[0]
+    if t == "snippet":
+        return {"type": "snippet", "text": sec[1]}
+    if t == "prose":
+        return {"type": "prose", "html": sec[1]}
+    if t == "howto":
+        return {"type": "howto", "items": [{"key": k, "label": l} for k, l in sec[1]]}
+    if t == "trial":
+        return {"type": "trial"}
+    if t == "faq":
+        return {"type": "faq", "items": [{"q": q, "a": a} for q, a in sec[1]]}
+    if t == "table":
+        return {
+            "type": "table",
+            "headers": list(sec[1]),
+            "rows": [list(r) for r in sec[2]],
+        }
+    if t == "cards":
+        return {
+            "type": "cards",
+            "items": [
+                {"title": ti, "desc": d, "href": h, "tag": tg}
+                for ti, d, h, tg in sec[1]
+            ],
+        }
+    if t == "related":
+        return {
+            "type": "related",
+            "title": sec[1],
+            "items": [{"label": l, "href": h} for l, h in sec[2]],
+        }
+    return {"type": "unknown"}
+
+
+def default_sections_for_editing(page: dict) -> list[dict]:
+    path = page["path"]
+    if path == "/":
+        return [section_tuple_to_dict(s) for s in HOME["sections"]]
+    if path in CONTENT:
+        return [section_tuple_to_dict(s) for s in CONTENT[path]["sections"]]
+    # Заглушки: пустой стартовый шаблон, чтобы можно было добавить текст.
+    return [
+        {"type": "snippet", "text": ""},
+        {"type": "prose", "html": ""},
+        {"type": "faq", "items": [{"q": "", "a": ""}, {"q": "", "a": ""}]},
+    ]
+
+
+def editor_sections(page: dict) -> list[dict]:
+    """Что показывать в форме редактирования: override (если есть) либо дефолт."""
+    ov_secs = load_overrides().get(page["path"], {}).get("sections")
+    if isinstance(ov_secs, list) and ov_secs:
+        return [s for s in ov_secs if isinstance(s, dict)]
+    return default_sections_for_editing(page)
+
+
+def sections_normalized(secs: list) -> list[dict]:
+    """Удаляет пустые поля/пары/строки. Используется и для сохранения,
+    и для сравнения «изменилось ли по сравнению с дефолтом»."""
+    out: list[dict] = []
+    for s in secs:
+        if not isinstance(s, dict):
+            continue
+        t = (s.get("type") or "").strip().lower()
+        if t == "snippet":
+            text = (s.get("text") or "").strip()
+            if text:
+                out.append({"type": "snippet", "text": text})
+        elif t == "prose":
+            h = (s.get("html") or "").strip()
+            if h:
+                out.append({"type": "prose", "html": h})
+        elif t == "howto":
+            items = []
+            for it in s.get("items") or []:
+                if not isinstance(it, dict):
+                    continue
+                k = (it.get("key") or "").strip()
+                l = (it.get("label") or "").strip()
+                if k:
+                    items.append({"key": k, "label": l})
+            if items:
+                out.append({"type": "howto", "items": items})
+        elif t == "trial":
+            out.append({"type": "trial"})
+        elif t == "faq":
+            items = []
+            for it in s.get("items") or []:
+                if not isinstance(it, dict):
+                    continue
+                q = (it.get("q") or "").strip()
+                a = (it.get("a") or "").strip()
+                if q and a:
+                    items.append({"q": q, "a": a})
+            if items:
+                out.append({"type": "faq", "items": items})
+        elif t == "table":
+            headers = [(h or "").strip() for h in s.get("headers") or []]
+            rows = []
+            for r in s.get("rows") or []:
+                if not isinstance(r, list):
+                    continue
+                row = [(c or "").strip() for c in r]
+                if any(row):
+                    rows.append(row)
+            if any(headers) and rows:
+                out.append({"type": "table", "headers": headers, "rows": rows})
+        elif t == "cards":
+            items = []
+            for it in s.get("items") or []:
+                if not isinstance(it, dict):
+                    continue
+                ti = (it.get("title") or "").strip()
+                de = (it.get("desc") or "").strip()
+                he = (it.get("href") or "").strip()
+                ta = (it.get("tag") or "").strip()
+                if ti and he:
+                    items.append({"title": ti, "desc": de, "href": he, "tag": ta})
+            if items:
+                out.append({"type": "cards", "items": items})
+        elif t == "related":
+            title = (s.get("title") or "").strip()
+            items = []
+            for it in s.get("items") or []:
+                if not isinstance(it, dict):
+                    continue
+                label = (it.get("label") or "").strip()
+                href = (it.get("href") or "").strip()
+                if label and href:
+                    items.append({"label": label, "href": href})
+            if title and items:
+                out.append({"type": "related", "title": title, "items": items})
+    return out
+
+
+def sections_equal_to_default(submitted: list, page: dict) -> bool:
+    return sections_normalized(submitted) == sections_normalized(
+        default_sections_for_editing(page)
+    )
+
+
+def parse_sections_from_form(form) -> list[dict]:
+    count = int((form.get("sections_count") or "0") or "0")
+    out: list[dict] = []
+    for i in range(count):
+        t = (form.get(f"s_{i}_type") or "").strip().lower()
+        if t == "snippet":
+            out.append({"type": "snippet", "text": (form.get(f"s_{i}_text") or "")})
+        elif t == "prose":
+            out.append({"type": "prose", "html": (form.get(f"s_{i}_html") or "")})
+        elif t == "howto":
+            n = int((form.get(f"s_{i}_count") or "0") or "0")
+            items = []
+            for j in range(n):
+                items.append({
+                    "key": (form.get(f"s_{i}_key_{j}") or ""),
+                    "label": (form.get(f"s_{i}_label_{j}") or ""),
+                })
+            out.append({"type": "howto", "items": items})
+        elif t == "trial":
+            out.append({"type": "trial"})
+        elif t == "faq":
+            n = int((form.get(f"s_{i}_count") or "0") or "0")
+            items = []
+            for j in range(n):
+                items.append({
+                    "q": (form.get(f"s_{i}_q_{j}") or ""),
+                    "a": (form.get(f"s_{i}_a_{j}") or ""),
+                })
+            out.append({"type": "faq", "items": items})
+        elif t == "table":
+            cols = int((form.get(f"s_{i}_cols") or "0") or "0")
+            rows_n = int((form.get(f"s_{i}_rows") or "0") or "0")
+            headers = [(form.get(f"s_{i}_h_{c}") or "") for c in range(cols)]
+            rows = []
+            for r in range(rows_n):
+                row = [(form.get(f"s_{i}_cell_{r}_{c}") or "") for c in range(cols)]
+                rows.append(row)
+            out.append({"type": "table", "headers": headers, "rows": rows})
+        elif t == "cards":
+            n = int((form.get(f"s_{i}_count") or "0") or "0")
+            items = []
+            for j in range(n):
+                items.append({
+                    "title": (form.get(f"s_{i}_card_{j}_title") or ""),
+                    "desc": (form.get(f"s_{i}_card_{j}_desc") or ""),
+                    "href": (form.get(f"s_{i}_card_{j}_href") or ""),
+                    "tag": (form.get(f"s_{i}_card_{j}_tag") or ""),
+                })
+            out.append({"type": "cards", "items": items})
+        elif t == "related":
+            n = int((form.get(f"s_{i}_count") or "0") or "0")
+            items = []
+            for j in range(n):
+                items.append({
+                    "label": (form.get(f"s_{i}_rel_{j}_label") or ""),
+                    "href": (form.get(f"s_{i}_rel_{j}_href") or ""),
+                })
+            out.append({
+                "type": "related",
+                "title": (form.get(f"s_{i}_title") or ""),
+                "items": items,
+            })
+    return out
+
+
+def render_section_widget(i: int, section: dict) -> str:
+    t = (section.get("type") or "").lower()
+    hidden_type = f'<input type="hidden" name="s_{i}_type" value="{esc(t)}">'
+    num = f'<span class="section-num">#{i + 1}</span>'
+
+    if t == "snippet":
+        text = section.get("text") or ""
+        return f"""
+<section class="block block--snippet">
+  <header class="block-head">{num}<span class="block-title">Сниппет — короткий лид-абзац</span>
+  <span class="block-hint">≤300 символов, без HTML</span></header>
+  {hidden_type}
+  <textarea name="s_{i}_text" rows="3" placeholder="Короткое вступление">{esc(text)}</textarea>
+</section>"""
+
+    if t == "prose":
+        html = section.get("html") or ""
+        return f"""
+<section class="block block--prose">
+  <header class="block-head">{num}<span class="block-title">Блок текста</span>
+  <span class="block-hint">HTML: &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;strong&gt;</span></header>
+  {hidden_type}
+  <textarea name="s_{i}_html" rows="12" class="mono">{esc(html)}</textarea>
+</section>"""
+
+    if t == "howto":
+        items = section.get("items") or []
+        items = [it for it in items if isinstance(it, dict)]
+        # гарантируем 3 стандартных ключа в порядке
+        by_key = {it.get("key", ""): it.get("label", "") for it in items}
+        steps_html = []
+        steps_html.append(f'<input type="hidden" name="s_{i}_count" value="{len(HOWTO_KEYS)}">')
+        for j, key in enumerate(HOWTO_KEYS):
+            label = by_key.get(key, "")
+            hint = HOWTO_KEY_HINT.get(key, "")
+            steps_html.append(
+                f'<div class="howto-row">'
+                f'<input type="hidden" name="s_{i}_key_{j}" value="{esc(key)}">'
+                f'<div class="howto-meta"><b>Шаг {j + 1}</b><span class="howto-key">{esc(key)}</span>'
+                f'<span class="howto-hint">{esc(hint)}</span></div>'
+                f'<input type="text" name="s_{i}_label_{j}" value="{esc(label)}" placeholder="Название шага">'
+                f'</div>'
+            )
+        return f"""
+<section class="block block--howto">
+  <header class="block-head">{num}<span class="block-title">Шаги настройки через Happ</span>
+  <span class="block-hint">Ключи шагов фиксированы — менять только подпись</span></header>
+  {hidden_type}
+  {"".join(steps_html)}
+</section>"""
+
+    if t == "trial":
+        return f"""
+<section class="block block--locked">
+  <header class="block-head">{num}<span class="block-title">Блок «Бесплатный тест 8 часов»</span>
+  <span class="locked-tag">фиксированный</span></header>
+  {hidden_type}
+  <p class="block-note">Кнопка регистрации + краткое описание триала. Текст этого блока вшит в шаблон.</p>
+</section>"""
+
+    if t == "faq":
+        items_in = section.get("items") or []
+        items_in = [it for it in items_in if isinstance(it, dict)]
+        # рендерим существующие + 2 пустых слота
+        total = max(len(items_in), 0) + 2
+        rows = [f'<input type="hidden" name="s_{i}_count" value="{total}">']
+        for j in range(total):
+            q = items_in[j].get("q", "") if j < len(items_in) else ""
+            a = items_in[j].get("a", "") if j < len(items_in) else ""
+            rows.append(
+                f'<div class="faq-row">'
+                f'<input type="text" name="s_{i}_q_{j}" value="{esc(q)}" placeholder="Вопрос {j + 1}">'
+                f'<textarea name="s_{i}_a_{j}" rows="2" placeholder="Ответ">{esc(a)}</textarea>'
+                f'</div>'
+            )
+        return f"""
+<section class="block block--faq">
+  <header class="block-head">{num}<span class="block-title">FAQ — вопросы и ответы</span>
+  <span class="block-hint">Пустые пары не сохраняются. Добавляйте, заполняя пустые слоты.</span></header>
+  {hidden_type}
+  {"".join(rows)}
+</section>"""
+
+    if t == "table":
+        headers = list(section.get("headers") or [])
+        rows = list(section.get("rows") or [])
+        cols = len(headers)
+        rows = [list(r) + [""] * max(0, cols - len(r)) for r in rows]
+        rows_n = len(rows)
+        style = f"grid-template-columns: repeat({max(cols, 1)}, minmax(0, 1fr));"
+        grid = [f'<div class="table-grid" style="{style}">']
+        for c, h in enumerate(headers):
+            grid.append(
+                f'<input type="text" name="s_{i}_h_{c}" value="{esc(h)}" class="th" placeholder="Заголовок {c + 1}">'
+            )
+        for r in range(rows_n):
+            for c in range(cols):
+                grid.append(
+                    f'<input type="text" name="s_{i}_cell_{r}_{c}" value="{esc(rows[r][c])}">'
+                )
+        grid.append("</div>")
+        return f"""
+<section class="block block--table">
+  <header class="block-head">{num}<span class="block-title">Таблица ({rows_n} × {cols})</span>
+  <span class="block-hint">Пустые строки пропускаются</span></header>
+  {hidden_type}
+  <input type="hidden" name="s_{i}_cols" value="{cols}">
+  <input type="hidden" name="s_{i}_rows" value="{rows_n}">
+  {"".join(grid)}
+</section>"""
+
+    if t == "cards":
+        items = [it for it in (section.get("items") or []) if isinstance(it, dict)]
+        passthrough = [f'<input type="hidden" name="s_{i}_count" value="{len(items)}">']
+        rows = []
+        for j, it in enumerate(items):
+            ti = it.get("title", "") or ""
+            de = it.get("desc", "") or ""
+            he = it.get("href", "") or ""
+            ta = it.get("tag", "") or ""
+            for k, v in (("title", ti), ("desc", de), ("href", he), ("tag", ta)):
+                passthrough.append(
+                    f'<input type="hidden" name="s_{i}_card_{j}_{k}" value="{esc(v)}">'
+                )
+            rows.append(
+                f'<li><b>{esc(ti)}</b>'
+                + (f' <span class="cards-desc">— {esc(de)}</span>' if de else "")
+                + f' <span class="path">{esc(he)}</span></li>'
+            )
+        return f"""
+<section class="block block--locked block--cards">
+  <header class="block-head">{num}<span class="block-title">Карточки навигации ({len(items)} шт.)</span>
+  <span class="locked-tag">не редактируется</span></header>
+  {hidden_type}
+  {"".join(passthrough)}
+  <ul class="cards-preview">{"".join(rows)}</ul>
+  <p class="block-note">Содержимое карточек правится в коде (scripts/site_data.py). Через админку отображается, но не меняется.</p>
+</section>"""
+
+    if t == "related":
+        items = [it for it in (section.get("items") or []) if isinstance(it, dict)]
+        title = section.get("title", "") or ""
+        passthrough = [
+            f'<input type="hidden" name="s_{i}_title" value="{esc(title)}">',
+            f'<input type="hidden" name="s_{i}_count" value="{len(items)}">',
+        ]
+        rows = []
+        for j, it in enumerate(items):
+            label = it.get("label", "") or ""
+            href = it.get("href", "") or ""
+            for k, v in (("label", label), ("href", href)):
+                passthrough.append(
+                    f'<input type="hidden" name="s_{i}_rel_{j}_{k}" value="{esc(v)}">'
+                )
+            rows.append(f'<li><b>{esc(label)}</b> <span class="path">{esc(href)}</span></li>')
+        return f"""
+<section class="block block--locked">
+  <header class="block-head">{num}<span class="block-title">Связанные ссылки: {esc(title)}</span>
+  <span class="locked-tag">авто</span></header>
+  {"".join(passthrough)}
+  {hidden_type}
+  <ul class="cards-preview">{"".join(rows)}</ul>
+</section>"""
+
+    return f"""
+<section class="block block--locked">
+  <header class="block-head">{num}<span class="block-title">Неизвестный блок «{esc(t)}»</span></header>
+  {hidden_type}
+</section>"""
 
 
 # ---------- Сборка ----------
@@ -503,6 +892,176 @@ table.list td .path-cell .path {{
 }}
 .editor .actions .spacer {{ flex: 1; }}
 
+/* ---- Контент-блоки ---- */
+.section-h {{
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}}
+.section-h:first-of-type {{ margin-top: 0; padding-top: 0; border-top: 0; }}
+.section-note {{
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: -4px 0 16px;
+  line-height: 1.55;
+}}
+.blocks {{ display: flex; flex-direction: column; gap: 16px; }}
+.block {{
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}}
+.block-head {{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}}
+.block-title {{
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}}
+.block-hint {{
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: auto;
+}}
+.section-num {{
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 999px;
+  min-width: 30px;
+  text-align: center;
+}}
+.locked-tag {{
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: auto;
+}}
+.block-note {{
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 6px 0 0;
+}}
+.block textarea,
+.block input[type=text] {{
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  line-height: 1.4;
+}}
+.block textarea:focus,
+.block input[type=text]:focus {{
+  outline: 0;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}}
+.block textarea {{ resize: vertical; }}
+.block textarea.mono {{
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}}
+
+/* HowTo */
+.howto-row {{
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}}
+.howto-meta {{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--text);
+}}
+.howto-meta .howto-key {{
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--primary);
+}}
+.howto-meta .howto-hint {{
+  font-size: 11px;
+  color: var(--text-muted);
+}}
+
+/* FAQ */
+.faq-row {{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}}
+.faq-row textarea {{ background: var(--surface-2); }}
+
+/* Table */
+.table-grid {{
+  display: grid;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+}}
+.table-grid input[type=text] {{ background: var(--surface-2); }}
+.table-grid input[type=text].th {{
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border-strong);
+}}
+
+/* Cards preview */
+.cards-preview {{
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}}
+.cards-preview li {{ margin-bottom: 4px; }}
+.cards-preview .cards-desc {{ color: var(--text-muted); }}
+.cards-preview .path {{ font-size: 11.5px; }}
+
+.block--locked {{ background: var(--surface); }}
+.block--locked textarea, .block--locked input[type=text] {{ display: none; }}
+
+@media (max-width: 720px) {{
+  .howto-row {{ grid-template-columns: 1fr; }}
+}}
+
 .subtitle {{
   display: flex;
   flex-wrap: wrap;
@@ -605,7 +1164,9 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
     ov_title = ov.get("title") or ""
     ov_desc = ov.get("description") or ""
     ov_h1 = ov.get("h1") or ""
-    is_overridden = any((v or "").strip() for v in (ov_title, ov_desc, ov_h1))
+    seo_overridden = any((v or "").strip() for v in (ov_title, ov_desc, ov_h1))
+    sec_overridden = isinstance(ov.get("sections"), list) and bool(ov.get("sections"))
+    is_overridden = seo_overridden or sec_overridden
 
     reset_form = ""
     if is_overridden:
@@ -620,8 +1181,12 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
 
     error_html = f'<div class="flash error">{esc(error)}</div>' if error else ""
 
+    # Контент-блоки
+    secs = editor_sections(page)
+    widgets = "".join(render_section_widget(i, s) for i, s in enumerate(secs))
+
     body = f"""
-<h1>Редактирование SEO</h1>
+<h1>Редактирование страницы</h1>
 <div class="subtitle">
   <span class="path">{esc(path)}</span>
   <span class="badge {esc(page['kind'])}">{esc(page_kind_label(page['kind']))}</span>
@@ -629,6 +1194,9 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
 {error_html}
 <form method="post" action="{url_for('save')}" class="editor">
   <input type="hidden" name="path" value="{esc(path)}">
+  <input type="hidden" name="sections_count" value="{len(secs)}">
+
+  <h2 class="section-h">SEO</h2>
 
   <div class="field">
     <label for="h1">H1 — заголовок на странице</label>
@@ -648,6 +1216,12 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
     <textarea id="description" name="description" placeholder="Оставьте пустым, чтобы использовать дефолт">{esc(ov_desc)}</textarea>
     <div class="hint">Рекомендуется 140–160 символов.</div>
     <div class="default"><b>Дефолт:</b> {esc(seo['description'])}</div>
+  </div>
+
+  <h2 class="section-h">Контент страницы</h2>
+  <p class="section-note">Блоки идут сверху вниз в том же порядке, что и на сайте. Карточки и блок «Бесплатный тест» правятся в коде. Кнопка «Сбросить к дефолту» уберёт ваши правки и вернёт страницу к исходному состоянию из <span class="path">site_data.py</span>.</p>
+  <div class="blocks">
+    {widgets}
   </div>
 
   <div class="actions">
@@ -695,6 +1269,9 @@ def save():
     description = (request.form.get("description") or "").strip()
     h1 = (request.form.get("h1") or "").strip()
 
+    parsed_sections = parse_sections_from_form(request.form)
+    cleaned_sections = sections_normalized(parsed_sections)
+
     with _write_lock:
         overrides = load_overrides()
         page_ov: dict = {}
@@ -704,6 +1281,11 @@ def save():
             page_ov["description"] = description
         if h1:
             page_ov["h1"] = h1
+
+        # Контент сохраняем, только если он отличается от дефолта из site_data.py.
+        default_secs_norm = sections_normalized(default_sections_for_editing(page))
+        if cleaned_sections and cleaned_sections != default_secs_norm:
+            page_ov["sections"] = cleaned_sections
 
         if page_ov:
             overrides[path] = page_ov
@@ -715,7 +1297,14 @@ def save():
 
     if not ok:
         seo = default_seo(page)
-        return render_edit(page, seo, {"title": title, "description": description, "h1": h1}, error=msg), 500
+        # Сохраняем введённое, чтобы юзер не потерял редактируемые поля.
+        retry_ov = {
+            "title": title,
+            "description": description,
+            "h1": h1,
+            "sections": cleaned_sections or default_sections_for_editing(page),
+        }
+        return render_edit(page, seo, retry_ov, error=msg), 500
 
     return redirect(url_for("index", saved=path))
 

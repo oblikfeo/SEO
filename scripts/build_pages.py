@@ -97,6 +97,97 @@ def pick(override: str | None, default: str) -> str:
     return s if s else default
 
 
+# ---------- Нормализация sections-override ----------
+
+def _coerce(v) -> str:
+    return v.strip() if isinstance(v, str) else ""
+
+
+def _normalize_section_dict(item) -> tuple | None:
+    """Конвертирует JSON-словарь из overrides в кортеж, который понимает render_sections."""
+    if not isinstance(item, dict):
+        return None
+    t = _coerce(item.get("type")).lower()
+    if t == "snippet":
+        text = _coerce(item.get("text"))
+        return ("snippet", text) if text else None
+    if t == "prose":
+        h = (item.get("html") or "").strip() if isinstance(item.get("html"), str) else ""
+        return ("prose", h) if h else None
+    if t == "howto":
+        items = []
+        for it in item.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            key = _coerce(it.get("key"))
+            label = _coerce(it.get("label"))
+            if key:
+                items.append((key, label))
+        return ("howto", items) if items else None
+    if t == "trial":
+        return ("trial",)
+    if t == "faq":
+        pairs = []
+        for it in item.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            q = _coerce(it.get("q"))
+            a = _coerce(it.get("a"))
+            if q and a:
+                pairs.append((q, a))
+        return ("faq", pairs) if pairs else None
+    if t == "table":
+        headers = [_coerce(h) for h in (item.get("headers") or [])]
+        rows: list[list[str]] = []
+        for r in item.get("rows") or []:
+            if not isinstance(r, list):
+                continue
+            row = [_coerce(c) for c in r]
+            if any(row):
+                rows.append(row)
+        if not headers or not rows:
+            return None
+        return ("table", headers, rows)
+    if t == "cards":
+        cards = []
+        for c in item.get("items") or []:
+            if not isinstance(c, dict):
+                continue
+            title = _coerce(c.get("title"))
+            desc = _coerce(c.get("desc"))
+            href = _coerce(c.get("href"))
+            tag = _coerce(c.get("tag"))
+            if title and href:
+                cards.append((title, desc, href, tag))
+        return ("cards", cards) if cards else None
+    if t == "related":
+        title = _coerce(item.get("title"))
+        items = []
+        for it in item.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            label = _coerce(it.get("label"))
+            href = _coerce(it.get("href"))
+            if label and href:
+                items.append((label, href))
+        if not title or not items:
+            return None
+        return ("related", title, items)
+    return None
+
+
+def sections_override(path: str) -> list | None:
+    raw = override_for(path).get("sections")
+    if not raw or not isinstance(raw, list):
+        return None
+    out: list = []
+    for raw_section in raw:
+        tup = _normalize_section_dict(raw_section)
+        if tup:
+            out.append(tup)
+    return out or None
+
+
 def attr(text: str) -> str:
     return html.escape(text, quote=True)
 
@@ -491,6 +582,12 @@ def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict],
     # Если задан h1-override — используем простой текст и игнорируем h1_html (с акцентами).
     h1_html = None if (ov.get("h1") or "").strip() else content.get("h1_html")
 
+    # Если есть override sections — заменяем список секций целиком.
+    sec_ov = sections_override(path)
+    if sec_ov is not None:
+        content = dict(content)
+        content["sections"] = sec_ov
+
     parts: list[str] = []
     if kicker:
         parts.append(f'<span class="lp-seo-kicker">{attr(kicker)}</span>')
@@ -513,6 +610,7 @@ def render_stub(
 ) -> tuple[str, str, str, list[dict], str | None]:
     kind = page["kind"]
     ov = override_for(page["path"])
+    sec_ov = sections_override(page["path"])
     brand_suffix = f"{cfg['brand']} {cfg['brand_vpn']}"
 
     if kind == "silo":
@@ -525,11 +623,20 @@ def render_stub(
         h1_text = pick(ov.get("h1"), title_h)
         snippet = pick(ov.get("description"), desc)
         page_title = pick(ov.get("title"), f"{title_h} — {brand_suffix}")
-        body = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
+        cards_html = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
+        if sec_ov:
+            body, extras = render_sections(sec_ov, cfg, depth, slug, "")
+            main = (
+                f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
+                + cards_html
+                + body
+                + standard_related_html(page, depth)
+            )
+            return page_title, snippet, main, list(extras), kicker
         main = (
             f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
             f'<p class="lp-snippet-bait">{attr(snippet)}</p>'
-            + body
+            + cards_html
             + render_trial(cfg, slug)
         )
         return page_title, snippet, main, [], kicker
@@ -544,11 +651,20 @@ def render_stub(
         h1_text = pick(ov.get("h1"), title_h)
         snippet = pick(ov.get("description"), desc)
         page_title = pick(ov.get("title"), f"{title_h} — {brand_suffix}")
-        body = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
+        cards_html = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
+        if sec_ov:
+            body, extras = render_sections(sec_ov, cfg, depth, slug, "")
+            main = (
+                f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
+                + cards_html
+                + body
+                + standard_related_html(page, depth)
+            )
+            return page_title, snippet, main, list(extras), kicker
         main = (
             f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
             f'<p class="lp-snippet-bait">{attr(snippet)}</p>'
-            + body
+            + cards_html
             + render_trial(cfg, slug)
             + standard_related_html(page, depth)
         )
@@ -564,6 +680,14 @@ def render_stub(
         ov.get("description"),
         f"VPN-решение для запроса «{name}». 8 часов бесплатного теста в Личном Кабинете.",
     )
+    if sec_ov:
+        body, extras = render_sections(sec_ov, cfg, depth, slug, "")
+        main = (
+            f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
+            + body
+            + standard_related_html(page, depth)
+        )
+        return page_title, page_desc, main, list(extras), kicker
     main = (
         f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
         + render_trial(cfg, slug)
