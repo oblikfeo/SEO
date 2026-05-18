@@ -90,14 +90,16 @@ def asset_href(depth: int, name: str) -> str:
 
 
 def site_path_href(depth: int, path: str) -> str:
-    """Превращает /a/b/ → ../../a/b/index.html (или /a/b/index.html на корне)."""
+    """Путь вида /a/b/ → URL без index.html (nginx отдаёт индекс по каталогу)."""
     if not path.startswith("/"):
         path = "/" + path
-    if path.endswith("/"):
-        path += "index.html"
-    elif not path.endswith(".html"):
-        path = path.rstrip("/") + "/index.html"
-    clean = path.lstrip("/")
+    if path == "/":
+        return "/" if depth == 0 else rel_prefix(depth)
+    if path.endswith(".html"):
+        clean = path.lstrip("/")
+        return ("/" + clean) if depth == 0 else rel_prefix(depth) + clean
+    norm = path if path.endswith("/") else path + "/"
+    clean = norm.lstrip("/")
     return ("/" + clean) if depth == 0 else rel_prefix(depth) + clean
 
 
