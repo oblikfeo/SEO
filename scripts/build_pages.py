@@ -219,7 +219,6 @@ def footer_html(cfg: dict, depth: int, slug: str) -> str:
         "</div>"
         '<div class="lp-seo-footer__bottom">'
         f"<span>© {attr(cfg['brand'])} {attr(cfg['brand_vpn'])} — стабильный доступ в России 2026.</span>"
-        f'<a href="{attr(site_path_href(depth, "/"))}">На главную</a>'
         "</div>"
         "</footer>"
     )
