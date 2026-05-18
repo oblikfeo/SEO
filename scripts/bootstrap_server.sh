@@ -25,6 +25,10 @@ fi
 
 chown -R www-data:www-data "$INSTALL_ROOT/public"
 
+# Мини-админка SEO (systemd unit + python3-flask) — устанавливается до nginx-reload,
+# чтобы upstream 127.0.0.1:5050 уже отвечал, когда nginx начнёт проксировать /admin/.
+bash "$INSTALL_ROOT/scripts/install_admin.sh"
+
 write_http_bootstrap() {
   cat >/etc/nginx/sites-available/seo-static <<EOF
 # Первичная выдача сертификата Let's Encrypt (HTTP-01 на порту 80).
@@ -35,6 +39,20 @@ server {
 
     root ${INSTALL_ROOT}/public;
     index index.html;
+
+    location /admin {
+        return 301 /admin/;
+    }
+
+    location /admin/ {
+        proxy_pass http://127.0.0.1:5050/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Prefix /admin;
+        proxy_read_timeout 90s;
+    }
 
     location / {
         try_files \$uri \$uri/ \$uri/index.html =404;
@@ -78,6 +96,20 @@ server {
 
     root ${INSTALL_ROOT}/public;
     index index.html;
+
+    location /admin {
+        return 301 /admin/;
+    }
+
+    location /admin/ {
+        proxy_pass http://127.0.0.1:5050/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Prefix /admin;
+        proxy_read_timeout 90s;
+    }
 
     location / {
         try_files \$uri \$uri/ \$uri/index.html =404;

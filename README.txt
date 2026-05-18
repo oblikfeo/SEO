@@ -22,6 +22,36 @@ SEO-лендинг «Надежда» (статика → SSR)
 Эталонный приоритетный контент ТЗ — в scripts/site_data.py (ветки с полными текстами).
 Остальные URL — заглушки с H1 и блоком trial (дерево из SEO-work/Дерево сайта.md).
 
+Подмена SEO-полей через админку (без правок Python)
+---------------------------------------------------
+Файл `content_overrides.json` (в корне seo-landing/) — JSON со словарём
+"<путь страницы>": { "title": "...", "description": "...", "h1": "..." }.
+build_pages.py подхватывает overrides поверх дефолтов из site_data.py.
+Пустые/отсутствующие поля → используется дефолт.
+
+Мини-админка (Flask) — управление SEO через браузер:
+  Локально:
+    pip install -r scripts/requirements-admin.txt
+    $env:ADMIN_USER='admin'; $env:ADMIN_PASSWORD='secret'   # PowerShell
+    python scripts/admin.py
+    http://127.0.0.1:5050/
+
+  На сервере (доступно как https://nadezhda.info/admin/):
+    bash scripts/install_admin.sh
+  Логин/пароль создаются автоматически в /etc/seo-admin.env (см. вывод скрипта)
+  или задаются переменными ADMIN_USER / ADMIN_PASSWORD при запуске install_admin.sh.
+  Конфиг nginx (location /admin/) разворачивается из scripts/bootstrap_server.sh.
+
+Что умеет админка:
+  - список всех 66 страниц сайта (главная + silo/hub/leaf/sub);
+  - редактирование title, meta description и H1 для любой страницы;
+  - кнопка «Сохранить и опубликовать» — пишет в content_overrides.json,
+    запускает build_pages.py и обновляет файлы в public/;
+  - кнопка «Сбросить к дефолту» — убирает override для страницы.
+
+Структуру (карточки, FAQ, таблицы, навигацию) админка НЕ редактирует —
+это логика лендинга, она остаётся в коде scripts/site_data.py.
+
 На проде: /dashboard/* и кабинет — noindex в mainServer (robots + meta), не в этой статике.
 
 GitHub и VPS (репозиторий SEO)

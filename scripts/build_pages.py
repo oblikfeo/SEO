@@ -35,6 +35,7 @@ from site_data import (  # noqa: E402
 )
 
 CFG_PATH = ROOT / "site_config.json"
+OVERRIDES_PATH = ROOT / "content_overrides.json"
 ASSETS_SRC = ROOT / "assets" / "css"
 PUBLIC = ROOT / "public"
 PUBLIC_ASSETS = PUBLIC / "assets" / "css"
@@ -66,6 +67,34 @@ _CARD_TAG_INTERNAL = re.compile(r"^P\d+$", re.IGNORECASE)
 
 def load_config() -> dict:
     return json.loads(CFG_PATH.read_text(encoding="utf-8"))
+
+
+_OVERRIDES_CACHE: dict | None = None
+
+
+def load_overrides() -> dict:
+    """Подмены SEO-полей (title/description/h1) по путям. Файл правит мини-админка."""
+    global _OVERRIDES_CACHE
+    if _OVERRIDES_CACHE is not None:
+        return _OVERRIDES_CACHE
+    if OVERRIDES_PATH.exists():
+        try:
+            _OVERRIDES_CACHE = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8")) or {}
+        except json.JSONDecodeError:
+            _OVERRIDES_CACHE = {}
+    else:
+        _OVERRIDES_CACHE = {}
+    return _OVERRIDES_CACHE
+
+
+def override_for(path: str) -> dict:
+    o = load_overrides().get(path, {})
+    return o if isinstance(o, dict) else {}
+
+
+def pick(override: str | None, default: str) -> str:
+    s = (override or "").strip()
+    return s if s else default
 
 
 def attr(text: str) -> str:
@@ -455,14 +484,20 @@ def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict],
     else:
         return render_stub(page, cfg, depth, slug)
 
+    ov = override_for(path)
+    title = pick(ov.get("title"), content["title"])
+    description = pick(ov.get("description"), content["description"])
+    h1_text = pick(ov.get("h1"), content["h1"])
+    # Если задан h1-override — используем простой текст и игнорируем h1_html (с акцентами).
+    h1_html = None if (ov.get("h1") or "").strip() else content.get("h1_html")
+
     parts: list[str] = []
     if kicker:
         parts.append(f'<span class="lp-seo-kicker">{attr(kicker)}</span>')
-    h1_html = content.get("h1_html")
     if h1_html:
         parts.append(f'<h1 class="lp-seo-h1">{h1_html}</h1>')
     else:
-        parts.append(f'<h1 class="lp-seo-h1">{attr(content["h1"])}</h1>')
+        parts.append(f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>')
 
     card_modifier = "lp-card-grid--3" if page.get("kind") in ("home", "silo", "hub") else ""
     body, extras = render_sections(content["sections"], cfg, depth, slug, card_modifier)
@@ -470,61 +505,71 @@ def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict],
     parts.append(body)
 
     extras_ld = list(extras) + schemas_for(content, cfg)
-    return content["title"], content["description"], "".join(parts), extras_ld, kicker
+    return title, description, "".join(parts), extras_ld, kicker
 
 
 def render_stub(
     page: dict, cfg: dict, depth: int, slug: str
 ) -> tuple[str, str, str, list[dict], str | None]:
     kind = page["kind"]
+    ov = override_for(page["path"])
+    brand_suffix = f"{cfg['brand']} {cfg['brand_vpn']}"
+
     if kind == "silo":
-        title, desc = SILO_META[page["silo"]]
+        title_h, desc = SILO_META[page["silo"]]
         kicker = None
         cards = [
             (hub_title, hub_desc, f"/{page['silo']}/{hub_slug}/", "")
             for hub_slug, hub_title, hub_desc in HUBS.get(page["silo"], [])
         ]
+        h1_text = pick(ov.get("h1"), title_h)
+        snippet = pick(ov.get("description"), desc)
+        page_title = pick(ov.get("title"), f"{title_h} — {brand_suffix}")
         body = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
         main = (
-            f'<h1 class="lp-seo-h1">{attr(title)}</h1>'
-            f'<p class="lp-snippet-bait">{attr(desc)}</p>'
+            f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
+            f'<p class="lp-snippet-bait">{attr(snippet)}</p>'
             + body
             + render_trial(cfg, slug)
         )
-        return f"{title} — {cfg['brand']} {cfg['brand_vpn']}", desc, main, [], kicker
+        return page_title, snippet, main, [], kicker
+
     if kind == "hub":
-        title, desc = page["title"], page["description"]
+        title_h, desc = page["title"], page["description"]
         kicker = None
         cards = [
             (LABELS.get(leaf, leaf.replace("-", " ").title()), "Открыть страницу.", f"/{page['silo']}/{page['hub']}/{leaf}/", "")
             for leaf in LEAVES.get((page["silo"], page["hub"]), [])
         ]
+        h1_text = pick(ov.get("h1"), title_h)
+        snippet = pick(ov.get("description"), desc)
+        page_title = pick(ov.get("title"), f"{title_h} — {brand_suffix}")
         body = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
         main = (
-            f'<h1 class="lp-seo-h1">{attr(title)}</h1>'
-            f'<p class="lp-snippet-bait">{attr(desc)}</p>'
+            f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
+            f'<p class="lp-snippet-bait">{attr(snippet)}</p>'
             + body
             + render_trial(cfg, slug)
             + standard_related_html(page, depth)
         )
-        return f"{title} — {cfg['brand']} {cfg['brand_vpn']}", desc, main, [], kicker
+        return page_title, snippet, main, [], kicker
 
     # leaf / sub stubs
     leaf = page.get("sub") or page.get("leaf", "page")
     name = LABELS.get(leaf, leaf.replace("-", " ").title())
     kicker = None
+    h1_text = pick(ov.get("h1"), f"VPN: {name}")
+    page_title = pick(ov.get("title"), f"VPN {name} — {brand_suffix}")
+    page_desc = pick(
+        ov.get("description"),
+        f"VPN-решение для запроса «{name}». 8 часов бесплатного теста в Личном Кабинете.",
+    )
     main = (
-        f'<h1 class="lp-seo-h1">{attr("VPN: " + name)}</h1>'
+        f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
         + render_trial(cfg, slug)
         + standard_related_html(page, depth)
     )
-    return (
-        f"VPN {name} — {cfg['brand']} {cfg['brand_vpn']}",
-        f"VPN-решение для запроса «{name}». 8 часов бесплатного теста в Личном Кабинете.",
-        main,
-        [],
-        kicker,
-    )
+    return page_title, page_desc, main, [], kicker
 
 
 # ---------- Page shell ----------

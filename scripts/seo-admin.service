@@ -1,0 +1,21 @@
+[Unit]
+Description=SEO landing admin (Flask, 127.0.0.1:5050)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/seo
+EnvironmentFile=/etc/seo-admin.env
+ExecStart=/usr/bin/env python3 /var/www/seo/scripts/admin.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
