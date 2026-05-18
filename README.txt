@@ -33,15 +33,18 @@ GitHub и VPS (репозиторий SEO)
   git remote add origin https://github.com/oblikfeo/SEO.git
   git add -A && git commit -m "..." && git push -u origin main
 
+Узел продакшена и домен: см. nadezhda.space — доступы4/readme.md
+  (IP 222.167.208.75, https://nadezhda.info/).
+
 На сервере (Ubuntu/Debian, после входа по SSH):
-  apt-get update && apt-get install -y git
+  apt-get update && apt-get install -y git ca-certificates curl
   cd /var/www && git clone https://github.com/oblikfeo/SEO.git seo && cd seo
   bash scripts/bootstrap_server.sh
 
-Обновление после push в main (быстро, без apt):
+Обновление после push в main (быстро, без полного bootstrap):
   cd /var/www/seo && git pull origin main && bash scripts/pull_and_reload.sh
 
-Полная переустановка конфигура nginx (редко):
+Полная переустановка nginx + TLS из актуального bootstrap (редко):
   cd /var/www/seo && bash scripts/bootstrap_server.sh
 
 Корень сайта для nginx: public/ (отдаётся как статика).
