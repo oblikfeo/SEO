@@ -190,7 +190,6 @@ def footer_html(cfg: dict, depth: int, slug: str) -> str:
     reg_footer = register_url(cfg, slug + "-footer-strip")
     reg_col = register_url(cfg, slug + "-footer-col")
     cabinet = external_url(cfg, "cabinet_path")
-    tg = cfg["telegram_support"]
 
     def li(label: str, href: str, external: bool = False) -> str:
         if external:
@@ -206,11 +205,7 @@ def footer_html(cfg: dict, depth: int, slug: str) -> str:
         li(LABELS.get(slug2, title), site_path_href(depth, f"/services/{slug2}/"))
         for slug2, title, _ in HUBS["services"]
     )
-    cabinet_li = (
-        li("Регистрация", reg_col)
-        + li("Личный Кабинет", cabinet)
-        + li("Поддержка (Telegram)", tg, external=True)
-    )
+    cabinet_li = li("Регистрация", reg_col) + li("Личный Кабинет", cabinet)
 
     return (
         '<div class="lp-trial-strip">'
