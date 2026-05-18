@@ -320,7 +320,12 @@ a:hover {{ text-decoration: underline; }}
 table.list {{
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }}
+table.list col.col-path    {{ width: 28%; }}
+table.list col.col-h1      {{ width: 32%; }}
+table.list col.col-title   {{ width: 30%; }}
+table.list col.col-action  {{ width: 10%; min-width: 130px; }}
 table.list th,
 table.list td {{
   padding: 12px 16px;
@@ -328,6 +333,7 @@ table.list td {{
   vertical-align: middle;
   font-size: 14px;
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
 }}
 table.list thead th {{
   background: var(--surface-2);
@@ -345,17 +351,28 @@ table.list tr.ov:hover td {{ background: #fff5e0; }}
 table.list td.col-actions {{
   text-align: right;
   white-space: nowrap;
-  width: 1%;
 }}
 table.list td .truncate {{
   display: block;
-  max-width: 460px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text);
 }}
 table.list td .truncate.muted {{ color: var(--text-muted); }}
+table.list td .path-cell {{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}}
+table.list td .path-cell .path {{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}}
 
 .path {{
   font-family: var(--mono);
@@ -495,10 +512,13 @@ table.list td .truncate.muted {{ color: var(--text-muted); }}
 }}
 .subtitle .path {{ font-size: 13px; }}
 
+@media (max-width: 900px) {{
+  table.list col.col-title {{ width: 0; }}
+  table.list th.col-title-th, table.list td.col-title-td {{ display: none; }}
+}}
 @media (max-width: 720px) {{
   .container {{ padding: 18px; }}
   .topbar {{ padding: 12px 18px; }}
-  table.list td .truncate {{ max-width: 220px; }}
   .editor {{ padding: 20px; }}
 }}
 </style></head><body>
@@ -542,10 +562,13 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
         cls = ' class="ov"' if r["overridden"] else ""
         rows_html.append(
             f'<tr{cls}>'
-            f'<td><span class="path">{esc(r["path"])}</span>'
-            f'<span class="badge {esc(r["kind"])}">{esc(page_kind_label(r["kind"]))}</span>{ov_badge}</td>'
-            f'<td><span class="truncate">{esc(r["h1"])}</span></td>'
-            f'<td><span class="truncate muted">{esc(r["title"])}</span></td>'
+            f'<td><div class="path-cell">'
+            f'<span class="path">{esc(r["path"])}</span>'
+            f'<span class="badge {esc(r["kind"])}">{esc(page_kind_label(r["kind"]))}</span>'
+            f'{ov_badge}'
+            f'</div></td>'
+            f'<td><span class="truncate" title="{esc(r["h1"])}">{esc(r["h1"])}</span></td>'
+            f'<td class="col-title-td"><span class="truncate muted" title="{esc(r["title"])}">{esc(r["title"])}</span></td>'
             f'<td class="col-actions">'
             f'<a class="btn btn-ghost btn-sm" href="{url_for("edit", path=r["path"])}">Редактировать</a></td>'
             f'</tr>'
@@ -564,7 +587,13 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
         f'<p class="page-meta">Всего страниц: <b>{total}</b> · с переопределённым SEO: <b>{overridden_n}</b></p>'
         f'<div class="card">'
         f'<table class="list">'
-        f'<thead><tr><th style="width:30%">Путь</th><th>H1</th><th>Title</th><th></th></tr></thead>'
+        f'<colgroup>'
+        f'<col class="col-path">'
+        f'<col class="col-h1">'
+        f'<col class="col-title">'
+        f'<col class="col-action">'
+        f'</colgroup>'
+        f'<thead><tr><th>Путь</th><th>H1</th><th class="col-title-th">Title</th><th></th></tr></thead>'
         f'<tbody>' + "".join(rows_html) + '</tbody>'
         f'</table></div>'
     )
