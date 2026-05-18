@@ -19,7 +19,7 @@ SEO-лендинг «Надежда» (статика → SSR)
   L2  /devices/mobile/
   L3  /devices/mobile/android/
 
-Полный текст P0 — в scripts/site_data.py (p0_content).
+Эталонный приоритетный контент ТЗ — в scripts/site_data.py (ветки с полными текстами).
 Остальные URL — заглушки с H1 и блоком trial (дерево из SEO-work/Дерево сайта.md).
 
 На проде: /dashboard/* и кабинет — noindex в mainServer (robots + meta), не в этой статике.
@@ -34,7 +34,7 @@ GitHub и VPS (репозиторий SEO)
   git add -A && git commit -m "..." && git push -u origin main
 
 Узел продакшена и домен: см. nadezhda.space — доступы4/readme.md
-  (IP 222.167.208.75, https://nadezhda.info/).
+  (IP 222.167.208.75; канонический домен сайта — https://nadezhda.space/ ).
 
 На сервере (Ubuntu/Debian, после входа по SSH):
   apt-get update && apt-get install -y git ca-certificates curl
