@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -55,6 +56,9 @@ NAV = [
     ("Рейтинги", "/reviews/"),
     ("Блог", "/blog/"),
 ]
+
+# Служебные метки вида P0 из ТЗ не выводим на карточках.
+_CARD_TAG_INTERNAL = re.compile(r"^P\d+$", re.IGNORECASE)
 
 
 # ---------- Утилиты ----------
@@ -232,7 +236,8 @@ def footer_html(cfg: dict, depth: int, slug: str) -> str:
 def render_card_grid(cards: list[tuple[str, str, str, str]], depth: int, modifier: str = "") -> str:
     items = []
     for title, desc, href, tag in cards:
-        tag_html = f'<span class="lp-hub-card__tag">{attr(tag)}</span>' if tag else ""
+        show_tag = bool(tag and tag.strip()) and not _CARD_TAG_INTERNAL.match(tag.strip())
+        tag_html = f'<span class="lp-hub-card__tag">{attr(tag)}</span>' if show_tag else ""
         items.append(
             f'<a class="lp-hub-card" href="{attr(site_path_href(depth, href))}">'
             f'<h3 class="lp-hub-card__title">{attr(title)}</h3>'
@@ -333,6 +338,52 @@ def render_related(title: str, items: list[tuple[str, str]], depth: int) -> str:
     return f'<section class="lp-related"><h2>{attr(title)}</h2><ul>{lis}</ul></section>'
 
 
+def standard_related_html(page: dict, depth: int) -> str:
+    """Единый блок навигации для hub / leaf / sub (контент из CONTENT или stub)."""
+    kind = page.get("kind")
+    silo = page.get("silo")
+    hub = page.get("hub")
+    if kind not in ("hub", "leaf", "sub") or not silo or not hub:
+        return ""
+    blocks: list[str] = []
+    hubs_links = [
+        (h_title, f"/{silo}/{h_slug}/")
+        for h_slug, h_title, _ in HUBS.get(silo, [])
+        if h_slug != hub
+    ]
+    if hubs_links:
+        blocks.append(render_related("Ещё в этом разделе", hubs_links, depth))
+
+    if kind == "leaf":
+        leaf = page.get("leaf")
+        if not leaf:
+            return "".join(blocks)
+        leaves_list = LEAVES.get((silo, hub), [])
+        leaf_links = [(LABELS[l], f"/{silo}/{hub}/{l}/") for l in leaves_list if l != leaf]
+        if leaf_links:
+            blocks.append(render_related("Другие страницы в этом разделе", leaf_links, depth))
+        subs = SUBLEAVES.get((silo, hub, leaf), [])
+        if subs:
+            sub_links = [(LABELS[s], f"/{silo}/{hub}/{leaf}/{s}/") for s in subs]
+            blocks.append(render_related("Углубитесь в тему", sub_links, depth))
+
+    elif kind == "sub":
+        leaf = page.get("leaf")
+        sub = page.get("sub")
+        if not leaf or not sub:
+            return "".join(blocks)
+        subs = SUBLEAVES.get((silo, hub, leaf), [])
+        sub_links = [(LABELS[s], f"/{silo}/{hub}/{leaf}/{s}/") for s in subs if s != sub]
+        if sub_links:
+            blocks.append(render_related("Другие материалы по этой теме", sub_links, depth))
+        leaves_list = LEAVES.get((silo, hub), [])
+        leaf_links = [(LABELS[l], f"/{silo}/{hub}/{l}/") for l in leaves_list if l != leaf]
+        if leaf_links:
+            blocks.append(render_related("Другие страницы в этом разделе", leaf_links, depth))
+
+    return "".join(blocks)
+
+
 def render_sections(
     sections: list[tuple],
     cfg: dict,
@@ -420,6 +471,7 @@ def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict],
 
     card_modifier = "lp-card-grid--3" if page.get("kind") in ("home", "silo", "hub") else ""
     body, extras = render_sections(content["sections"], cfg, depth, slug, card_modifier)
+    body += standard_related_html(page, depth)
     parts.append(body)
 
     extras_ld = list(extras) + schemas_for(content, cfg)
@@ -453,18 +505,12 @@ def render_stub(
             for leaf in LEAVES.get((page["silo"], page["hub"]), [])
         ]
         body = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
-        related_silo = [
-            (h_title, f"/{page['silo']}/{h_slug}/")
-            for h_slug, h_title, _ in HUBS.get(page["silo"], [])
-            if h_slug != page["hub"]
-        ]
-        related_block = render_related("Ещё в этом разделе", related_silo, depth) if related_silo else ""
         main = (
             f'<h1 class="lp-seo-h1">{attr(title)}</h1>'
             f'<p class="lp-snippet-bait">{attr(desc)}</p>'
             + body
             + render_trial(cfg, slug)
-            + related_block
+            + standard_related_html(page, depth)
         )
         return f"{title} — {cfg['brand']} {cfg['brand_vpn']}", desc, main, [], kicker
 
@@ -475,6 +521,7 @@ def render_stub(
     main = (
         f'<h1 class="lp-seo-h1">{attr("VPN: " + name)}</h1>'
         + render_trial(cfg, slug)
+        + standard_related_html(page, depth)
     )
     return (
         f"VPN {name} — {cfg['brand']} {cfg['brand_vpn']}",
