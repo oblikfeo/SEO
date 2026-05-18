@@ -1,7 +1,7 @@
 {
   "brand": "Надежда",
   "brand_vpn": "VPN",
-  "base_url": "https://nadezhda.info",
+  "base_url": "https://nadezhda.space",
   "register_path": "/register",
   "login_path": "/login",
   "cabinet_path": "/dashboard",
