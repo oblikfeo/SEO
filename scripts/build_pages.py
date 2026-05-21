@@ -37,8 +37,11 @@ from site_data import (  # noqa: E402
 CFG_PATH = ROOT / "site_config.json"
 OVERRIDES_PATH = ROOT / "content_overrides.json"
 ASSETS_SRC = ROOT / "assets" / "css"
+ASSETS_ROOT = ROOT / "assets"
 PUBLIC = ROOT / "public"
 PUBLIC_ASSETS = PUBLIC / "assets" / "css"
+
+FAVICON_FILES = ["favicon.ico", "gemini-svg.svg"]
 
 CSS_FILES = [
     "tokens.css",
@@ -211,6 +214,19 @@ def rel_prefix(depth: int) -> str:
 
 def asset_href(depth: int, name: str) -> str:
     return rel_prefix(depth) + "assets/css/" + name
+
+
+def root_asset_href(depth: int, name: str) -> str:
+    return rel_prefix(depth) + name
+
+
+def favicon_links_html(depth: int) -> str:
+    ico = root_asset_href(depth, "favicon.ico")
+    svg = root_asset_href(depth, "gemini-svg.svg")
+    return (
+        f'<link rel="icon" href="{attr(ico)}" sizes="32x32" type="image/x-icon">\n'
+        f'<link rel="icon" href="{attr(svg)}" type="image/svg+xml" sizes="any">\n'
+    )
 
 
 def site_path_href(depth: int, path: str) -> str:
@@ -768,6 +784,7 @@ def page_shell(
         f'<meta property="og:description" content="{attr(description)}">\n'
         f'<meta property="og:url" content="{attr(canon)}">\n'
         f'<meta property="og:site_name" content="{attr(cfg["brand"] + " " + cfg["brand_vpn"])}">\n'
+        f"{favicon_links_html(depth)}"
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">\n'
@@ -830,6 +847,10 @@ def main() -> None:
         src = ASSETS_SRC / f
         if src.exists():
             shutil.copy2(src, PUBLIC_ASSETS / f)
+    for f in FAVICON_FILES:
+        src = ASSETS_ROOT / f
+        if src.exists():
+            shutil.copy2(src, PUBLIC / f)
 
     pages = build_pages_list()
     write_robots(cfg)
