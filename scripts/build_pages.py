@@ -380,6 +380,18 @@ def render_card_grid(cards: list[tuple[str, str, str, str]], depth: int, modifie
     return f'<div class="{cls}">' + "".join(items) + "</div>"
 
 
+def wrap_bare_tables(html: str) -> str:
+    """Оборачивает <table> из prose в lp-table-wrap (если админ вставил таблицу в HTML)."""
+    if "<table" not in html.lower() or "lp-table-wrap" in html:
+        return html
+    return re.sub(
+        r"(<table\b[\s\S]*?</table>)",
+        r'<div class="lp-table-wrap">\1</div>',
+        html,
+        flags=re.IGNORECASE,
+    )
+
+
 def render_table(headers: list[str], rows: list[list[str]]) -> str:
     thead = "".join(f"<th>{attr(h)}</th>" for h in headers)
     body_rows = "".join(
@@ -528,7 +540,7 @@ def render_sections(
     for sec in sections:
         kind = sec[0]
         if kind == "prose":
-            out.append(f'<div class="lp-prose">{sec[1]}</div>')
+            out.append(f'<div class="lp-prose">{wrap_bare_tables(sec[1])}</div>')
         elif kind == "snippet":
             out.append(f'<p class="lp-snippet-bait">{sec[1]}</p>')
         elif kind == "cards":
