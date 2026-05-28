@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import shutil
 import sys
@@ -836,12 +837,43 @@ def write_sitemap(cfg: dict, pages: list[dict]) -> None:
     (PUBLIC / "sitemap.xml").write_text(xml, encoding="utf-8")
 
 
+def chown_public_to_www_data() -> None:
+    """После сборки от root — вернуть public/ www-data, иначе админка не сможет пересобрать."""
+    if os.name != "posix" or os.geteuid() != 0 or not PUBLIC.exists():
+        return
+    try:
+        import pwd
+
+        pw = pwd.getpwnam("www-data")
+        uid, gid = pw.pw_uid, pw.pw_gid
+    except (ImportError, KeyError):
+        return
+    for root, dirs, files in os.walk(PUBLIC):
+        os.chown(root, uid, gid)
+        for name in files:
+            os.chown(os.path.join(root, name), uid, gid)
+        for name in dirs:
+            os.chown(os.path.join(root, name), uid, gid)
+
+
+def reset_public_dir() -> None:
+    """Очистить public/, не удаляя сам каталог.
+
+    Админка (www-data) не может rmdir public под root-owned /var/www/seo — только
+    содержимое. Полный shutil.rmtree(PUBLIC) даёт PermissionError на сервере.
+    """
+    PUBLIC.mkdir(parents=True, exist_ok=True)
+    for child in PUBLIC.iterdir():
+        if child.is_dir():
+            shutil.rmtree(child)
+        else:
+            child.unlink()
+
+
 def main() -> None:
     cfg = load_config()
 
-    if PUBLIC.exists():
-        shutil.rmtree(PUBLIC)
-    PUBLIC.mkdir(parents=True)
+    reset_public_dir()
     PUBLIC_ASSETS.mkdir(parents=True)
     for f in CSS_FILES:
         src = ASSETS_SRC / f
@@ -879,6 +911,7 @@ def main() -> None:
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "index.html").write_text(html_text, encoding="utf-8")
 
+    chown_public_to_www_data()
     print(f"Built {len(pages)} pages -> {PUBLIC}")
 
 
