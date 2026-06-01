@@ -56,7 +56,15 @@ HUBS = {
 }
 
 LEAVES = {
-    ("devices", "desktop"): ["windows", "macos", "linux"],
+    ("devices", "desktop"): [
+        "windows",
+        "macos",
+        "linux",
+        "gaming",
+        "streaming",
+        "alternatives",
+        "download",
+    ],
     ("devices", "mobile"): ["android", "ios", "huawei-honor"],
     ("devices", "browsers"): ["general", "yandex", "chrome", "opera", "firefox"],
     ("devices", "tv"): ["smart-tv", "android-tv", "apple-tv"],
@@ -143,7 +151,9 @@ LABELS = {
     "apk": "APK без вирусов",
     "gaming": "Игры и низкий пинг",
     "messengers": "Мессенджеры в фоне",
-    "streaming": "YouTube, TikTok",
+    "streaming": "YouTube и медиа",
+    "alternatives": "Сравнение альтернатив",
+    "download": "Скачивание и установка",
 }
 
 
@@ -222,6 +232,10 @@ DESKTOP_HUB = {
             ("VPN для Windows", "Полноразмерное руководство по настройке для Windows 7, 10 и 11: брандмауэр, конфликты и обход блокировок на уровне всей ОС.", "/devices/desktop/windows/", ""),
             ("VPN для macOS", "Стабильное подключение на MacBook и iMac: импорт подписки в Happ, Split Tunneling и работа с заблокированными сервисами.", "/devices/desktop/macos/", ""),
             ("VPN для Linux", "Официальный клиент Happ, установка без регистрации и сравнение с альтернативами (Амнезия, ByeByeDPI, Jump Jump).", "/devices/desktop/linux/", ""),
+            ("VPN для игр на ПК", "Discord, Roblox и Radmin VPN: низкий пинг и стабильное соединение через Happ на Windows и macOS.", "/devices/desktop/gaming/", ""),
+            ("VPN для YouTube на ПК", "YouTube в 4K, расширения для браузера и Яндекс Браузер — медиа без замедления на компьютере.", "/devices/desktop/streaming/", ""),
+            ("Сравнение VPN для ПК", "ByeByeDPI, Амнезия и Planet VPN против Happ + Reality: честное сравнение для десктопа.", "/devices/desktop/alternatives/", ""),
+            ("Скачать VPN на ПК", "Официальная загрузка, установка Happ и безопасные ссылки из Личного кабинета.", "/devices/desktop/download/", ""),
         ]),
         ("prose", "<h2>Сравнение десктопных протоколов: скорость, стабильность и скрытность</h2><p>Для повседневной работы за стационарным компьютером или ноутбуком критически важно, чтобы запущенный VPN-клиент не перегружал центральный процессор фоновым шифрованием и обеспечивал максимальную пропускную способность домашнего интернет-канала.</p>"),
         ("table", ["Технология / Протокол", "Скорость передачи данных", "Уровень маскировки (обход ТСПУ)", "Назначение и специфика"], [
