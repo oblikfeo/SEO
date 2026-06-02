@@ -36,6 +36,8 @@ from site_data import (  # noqa: E402
 )
 
 CFG_PATH = ROOT / "site_config.json"
+# КРИТИЧНО: overrides с продакшена (админка SEO). В git — только {}.
+# Деплой: scripts/safe_git_update.sh (бэкап → git reset → restore). См. AGENTS-SEO.md
 OVERRIDES_PATH = ROOT / "content_overrides.json"
 ASSETS_SRC = ROOT / "assets" / "css"
 ASSETS_ROOT = ROOT / "assets"

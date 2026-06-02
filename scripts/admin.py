@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """Мини-админка для управления SEO (title / description / H1) SEO-лендинга.
 
+КРИТИЧНО: «Сохранить и опубликовать» пишет в content_overrides.json на сервере.
+Этот файл — рабочая база SEO; в git только пустой {}. Деплой без safe_git_update.sh
+(git reset --hard) СТИРАЕТ недели работы. См. AGENTS-SEO.md, content_overrides.README.txt.
+
 Один файл, один шаблон — без БД, без фронт-фреймворков.
 Правки пишутся в seo-landing/content_overrides.json, после чего сразу запускается
 build_pages.py и обновляются файлы в public/.
@@ -696,6 +700,17 @@ a:hover {{ text-decoration: underline; }}
   font-family: var(--mono);
   font-size: 12px;
 }}
+.admin-critical-banner {{
+  padding: 12px 16px;
+  margin: 0 0 20px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius);
+  font-size: 13px;
+  line-height: 1.5;
+}}
+.admin-critical-banner strong {{ color: #78350f; }}
 
 /* ---- Таблица ---- */
 .card {{
@@ -1089,6 +1104,11 @@ table.list td .path-cell .path {{
   </nav>
 </header>
 <main class="container">
+<div class="admin-critical-banner" role="note">
+  <strong>Данные только на этом сервере.</strong>
+  «Сохранить и опубликовать» пишет в <code>content_overrides.json</code>.
+  Деплой кода — <code>scripts/safe_git_update.sh</code>; голый <code>git reset --hard</code> без бэкапа overrides удалит тексты.
+</div>
 {flash_html}
 {body}
 </main>

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """Дерево URL и контент SEO-лендинга.
 
+КОНТЕНТ СТРАНИЦ (prose, FAQ, title): SEO-специалист правит через админку →
+content_overrides.json на сервере. Агент/разработчик меняет здесь только структуру
+(LEAVES, карточки хабов, CONTENT для эталонных страниц). См. AGENTS-SEO.md.
+
 Тексты для L1 /devices/, L2 /devices/mobile/, L3 /devices/mobile/android/
 и L4 /devices/mobile/android/{apk,gaming,messengers,streaming}/ перенесены
 ДОСЛОВНО из SEO-work/Контент/... без редакторской правки.

@@ -18,9 +18,8 @@ if [[ ! -d "$INSTALL_ROOT/.git" ]]; then
   mkdir -p "$(dirname "$INSTALL_ROOT")"
   git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$INSTALL_ROOT"
 else
-  cd "$INSTALL_ROOT"
-  git fetch origin "$BRANCH"
-  git reset --hard "origin/$BRANCH"
+  # Не затирать content_overrides.json (админка SEO) — см. safe_git_update.sh
+  bash "$INSTALL_ROOT/scripts/safe_git_update.sh"
 fi
 
 chown -R www-data:www-data "$INSTALL_ROOT/public"

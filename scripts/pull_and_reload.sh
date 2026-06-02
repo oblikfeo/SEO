@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # После git pull/fetch на сервере: права на public/ и reload nginx (без apt).
+# Обновление кода из git — только через scripts/safe_git_update.sh
+# (иначе git reset --hard сотрёт content_overrides.json с данными админки SEO).
 set -euo pipefail
 
 INSTALL_ROOT="${INSTALL_ROOT:-/var/www/seo}"
