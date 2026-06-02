@@ -211,6 +211,10 @@ def external_url(cfg: dict, path_key: str) -> str:
     return cfg["base_url"].rstrip("/") + cfg.get(path_key, "/")
 
 
+def public_site_url(cfg: dict) -> str:
+    return cfg.get("site_url", "https://nadezhda.info").rstrip("/")
+
+
 def rel_prefix(depth: int) -> str:
     return "../" * depth if depth else ""
 
@@ -290,7 +294,7 @@ def breadcrumbs_ld(cfg: dict, crumbs: list[tuple[str, str]]) -> str:
             "@type": "ListItem",
             "position": i + 1,
             "name": n,
-            "item": cfg["base_url"].rstrip("/") + p,
+            "item": public_site_url(cfg) + p,
         }
         for i, (n, p) in enumerate(crumbs)
     ]
@@ -575,7 +579,7 @@ def schemas_for(content: dict, cfg: dict) -> list[dict]:
                 "@context": "https://schema.org",
                 "@type": "Organization",
                 "name": cfg["brand"],
-                "url": cfg["base_url"],
+                "url": public_site_url(cfg),
                 "sameAs": [cfg["telegram_support"]],
             })
         elif key == "software_app":
@@ -777,7 +781,7 @@ def page_shell(
     main_html: str,
     extras_ld: list[dict],
 ) -> str:
-    canon = cfg["base_url"].rstrip("/") + canonical_path
+    canon = public_site_url(cfg) + canonical_path
     css_links = "\n".join(f'  <link rel="stylesheet" href="{attr(asset_href(depth, f))}">' for f in CSS_FILES)
     crumbs_with_href = [(n, p) for n, p in crumbs if p]
     bc_ld = breadcrumbs_ld(cfg, crumbs_with_href) if crumbs_with_href else ""
@@ -824,20 +828,17 @@ def page_shell(
 
 
 def write_robots(cfg: dict) -> None:
-    base = cfg["base_url"].rstrip("/")
+    site = public_site_url(cfg)
     (PUBLIC / "robots.txt").write_text(
         "User-agent: *\n"
         "Allow: /\n"
-        "Disallow: /dashboard/\n"
-        "Disallow: /cabinet/\n"
-        "Disallow: /nice\n"
-        f"Sitemap: {base}/sitemap.xml\n",
+        f"Sitemap: {site}/sitemap.xml\n",
         encoding="utf-8",
     )
 
 
 def write_sitemap(cfg: dict, pages: list[dict]) -> None:
-    base = cfg["base_url"].rstrip("/")
+    base = public_site_url(cfg)
     urls = []
     for page in pages:
         loc = base + page["path"]

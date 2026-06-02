@@ -1,6 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard/
-Disallow: /cabinet/
-Disallow: /nice
-Sitemap: https://nadezhda.space/sitemap.xml
+Sitemap: https://nadezhda.info/sitemap.xml
