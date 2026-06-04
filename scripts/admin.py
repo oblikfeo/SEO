@@ -635,6 +635,56 @@ def esc(s: str) -> str:
     return html.escape(s or "", quote=True)
 
 
+# Переключатель «Альтернативный вид»: класс admin-alt на <html> + сохранение в
+# localStorage. Базовый вид не меняется — это отдельная тема поверх той же вёрстки.
+ALT_VIEW_HEAD = """
+<script>
+(function(){try{if(localStorage.getItem('adminAltView')==='1'){document.documentElement.classList.add('admin-alt');}}catch(e){}})();
+function toggleAltView(){try{var on=document.documentElement.classList.toggle('admin-alt');localStorage.setItem('adminAltView',on?'1':'0');}catch(e){}}
+</script>
+"""
+
+ALT_VIEW_CSS = """
+/* ======== Альтернативный вид (тумблер в шапке) ======== */
+.view-toggle {
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  color: var(--text-muted); background: var(--surface-2);
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  padding: 7px 13px; cursor: pointer; line-height: 1.2;
+}
+.view-toggle:hover { color: var(--primary); border-color: var(--primary); }
+html.admin-alt .view-toggle { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* Список страниц: ровные колонки, зебра, читаемый путь, кнопка не уезжает */
+html.admin-alt table.list { table-layout: auto; }
+html.admin-alt table.list th,
+html.admin-alt table.list td { padding: 11px 18px; }
+html.admin-alt table.list tbody tr:nth-child(even) td { background: var(--surface-2); }
+html.admin-alt table.list tbody tr:hover td { background: #eef4ff; }
+html.admin-alt table.list tr.ov td { background: #fff7ed; }
+html.admin-alt table.list tr.ov:hover td { background: #ffedd5; }
+html.admin-alt table.list td .path {
+  background: transparent; border: 0; padding: 0;
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+html.admin-alt table.list td .truncate { white-space: normal; }
+html.admin-alt table.list td.col-actions { width: 1%; white-space: nowrap; }
+html.admin-alt table.list .btn-ghost { border-color: var(--primary); color: var(--primary); }
+html.admin-alt table.list .btn-ghost:hover { background: var(--primary); color: #fff; }
+
+/* Форма редактирования: уже и спокойнее, блоки на сером фоне */
+html.admin-alt .editor { max-width: 880px; }
+html.admin-alt .block { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; }
+
+/* Таблица-виджет: ровные ячейки с границами */
+html.admin-alt table.tbl-edit { border-collapse: collapse; border-spacing: 0; width: 100%; table-layout: fixed; }
+html.admin-alt table.tbl-edit th,
+html.admin-alt table.tbl-edit td { padding: 0; border: 1px solid var(--border); }
+html.admin-alt table.tbl-edit input[type=text] { border: 0; border-radius: 0; min-width: 0; background: var(--surface); }
+html.admin-alt table.tbl-edit input[type=text].th { background: var(--surface-2); font-weight: 600; }
+"""
+
+
 def layout(title: str, body: str, flash: str = "") -> str:
     flash_html = f'<div class="flash">{flash}</div>' if flash else ""
     return f"""<!doctype html>
@@ -1224,12 +1274,14 @@ table.tbl-edit input[type=text].th {{
   .topbar {{ padding: 12px 18px; }}
   .editor {{ padding: 20px; }}
 }}
-</style></head><body>
+{ALT_VIEW_CSS}
+</style>{ALT_VIEW_HEAD}</head><body>
 <header class="topbar">
   <span class="brand">SEO админка<span class="brand-sub">· Надежда VPN</span></span>
   <nav>
     <a href="{url_for('index')}">Страницы</a>
     <a href="https://nadezhda.info/" target="_blank" rel="noopener">Открыть сайт ↗</a>
+    <button type="button" class="view-toggle" onclick="toggleAltView()">Альтернативный вид</button>
   </nav>
 </header>
 <main class="container">
