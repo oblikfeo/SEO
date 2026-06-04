@@ -23,6 +23,7 @@
   <url><loc>https://nadezhda.info/devices/mobile/android/streaming/</loc></url>
   <url><loc>https://nadezhda.info/devices/mobile/ios/</loc></url>
   <url><loc>https://nadezhda.info/devices/mobile/huawei-honor/</loc></url>
+  <url><loc>https://nadezhda.info/devices/mobile/samsung/</loc></url>
   <url><loc>https://nadezhda.info/devices/browsers/</loc></url>
   <url><loc>https://nadezhda.info/devices/browsers/general/</loc></url>
   <url><loc>https://nadezhda.info/devices/browsers/yandex/</loc></url>
@@ -41,33 +42,77 @@
   <url><loc>https://nadezhda.info/services/social/instagram/</loc></url>
   <url><loc>https://nadezhda.info/services/social/tiktok/</loc></url>
   <url><loc>https://nadezhda.info/services/social/linkedin/</loc></url>
+  <url><loc>https://nadezhda.info/services/social/other/</loc></url>
   <url><loc>https://nadezhda.info/services/video/</loc></url>
   <url><loc>https://nadezhda.info/services/video/youtube/</loc></url>
   <url><loc>https://nadezhda.info/services/video/netflix/</loc></url>
+  <url><loc>https://nadezhda.info/services/video/twitch/</loc></url>
+  <url><loc>https://nadezhda.info/services/video/spotify/</loc></url>
   <url><loc>https://nadezhda.info/services/gaming/</loc></url>
   <url><loc>https://nadezhda.info/services/gaming/roblox/</loc></url>
   <url><loc>https://nadezhda.info/services/gaming/discord/</loc></url>
   <url><loc>https://nadezhda.info/services/gaming/online-games/</loc></url>
   <url><loc>https://nadezhda.info/services/gaming/steam/</loc></url>
   <url><loc>https://nadezhda.info/services/gaming/ps-xbox/</loc></url>
+  <url><loc>https://nadezhda.info/services/gaming/brawl-stars/</loc></url>
+  <url><loc>https://nadezhda.info/services/gaming/minecraft/</loc></url>
   <url><loc>https://nadezhda.info/services/tools/</loc></url>
   <url><loc>https://nadezhda.info/services/tools/telegram/</loc></url>
   <url><loc>https://nadezhda.info/services/tools/chatgpt-openai/</loc></url>
+  <url><loc>https://nadezhda.info/services/tools/messengers/</loc></url>
+  <url><loc>https://nadezhda.info/services/tools/video-calls/</loc></url>
   <url><loc>https://nadezhda.info/kb/fixes/</loc></url>
   <url><loc>https://nadezhda.info/kb/fixes/vpn-not-working/</loc></url>
   <url><loc>https://nadezhda.info/kb/fixes/slow-speed/</loc></url>
+  <url><loc>https://nadezhda.info/kb/fixes/android/</loc></url>
+  <url><loc>https://nadezhda.info/kb/fixes/iphone/</loc></url>
+  <url><loc>https://nadezhda.info/kb/fixes/windows/</loc></url>
+  <url><loc>https://nadezhda.info/kb/fixes/happ/</loc></url>
   <url><loc>https://nadezhda.info/kb/guides/</loc></url>
   <url><loc>https://nadezhda.info/kb/guides/how-to-setup/</loc></url>
   <url><loc>https://nadezhda.info/kb/guides/how-to-share/</loc></url>
+  <url><loc>https://nadezhda.info/kb/guides/vpn-keys/</loc></url>
+  <url><loc>https://nadezhda.info/kb/guides/install-happ/</loc></url>
+  <url><loc>https://nadezhda.info/kb/guides/enable-disable/</loc></url>
+  <url><loc>https://nadezhda.info/kb/guides/no-registration/</loc></url>
   <url><loc>https://nadezhda.info/kb/education/</loc></url>
   <url><loc>https://nadezhda.info/kb/education/what-is-vpn/</loc></url>
   <url><loc>https://nadezhda.info/kb/education/legality-russia/</loc></url>
+  <url><loc>https://nadezhda.info/kb/education/how-bypass/</loc></url>
+  <url><loc>https://nadezhda.info/kb/education/vpn-vs-proxy/</loc></url>
+  <url><loc>https://nadezhda.info/kb/education/vpn-types/</loc></url>
   <url><loc>https://nadezhda.info/tech/protocols/</loc></url>
   <url><loc>https://nadezhda.info/tech/protocols/modern-protocols/</loc></url>
+  <url><loc>https://nadezhda.info/tech/protocols/vless-reality/</loc></url>
+  <url><loc>https://nadezhda.info/tech/protocols/wireguard-amnezia/</loc></url>
+  <url><loc>https://nadezhda.info/tech/protocols/shadowsocks/</loc></url>
+  <url><loc>https://nadezhda.info/tech/protocols/hysteria/</loc></url>
   <url><loc>https://nadezhda.info/tech/servers/</loc></url>
   <url><loc>https://nadezhda.info/tech/servers/private-ip/</loc></url>
   <url><loc>https://nadezhda.info/tech/servers/self-hosted-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/tech/servers/security/</loc></url>
+  <url><loc>https://nadezhda.info/tech/servers/split-tunneling/</loc></url>
   <url><loc>https://nadezhda.info/reviews/lists/</loc></url>
   <url><loc>https://nadezhda.info/reviews/lists/best-vpn-2026/</loc></url>
   <url><loc>https://nadezhda.info/reviews/lists/free-vpn-risks/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/happ-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/jump-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/adguard-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/radmin-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/amnezia-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/telegram-vpn-bots/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/planet-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/proton-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/outline-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/v2raytun/</loc></url>
+  <url><loc>https://nadezhda.info/reviews/apps/browsec/</loc></url>
+  <url><loc>https://nadezhda.info/blog/working-vpn-russia/</loc></url>
+  <url><loc>https://nadezhda.info/blog/russian-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/blog/buy-vpn/</loc></url>
+  <url><loc>https://nadezhda.info/blog/vpn-subscription/</loc></url>
+  <url><loc>https://nadezhda.info/blog/amnezia-setup/</loc></url>
+  <url><loc>https://nadezhda.info/blog/vpn-no-viruses/</loc></url>
+  <url><loc>https://nadezhda.info/blog/tspu-whitelist/</loc></url>
+  <url><loc>https://nadezhda.info/blog/vpn-config/</loc></url>
 </urlset>
