@@ -229,123 +229,111 @@ def build_index_tree(rows: list[dict]) -> tuple[list[dict], dict[str, dict]]:
     return home, silos
 
 
-def render_index_page_li(row: dict) -> str:
-    ov_badge = '<span class="badge override">правки</span>' if row["overridden"] else ""
-    cls = "idx-page ov" if row["overridden"] else "idx-page"
+def index_row_display_name(row: dict) -> str:
+    if row["kind"] == "home":
+        return "Главная"
+    if row["kind"] == "silo" and row.get("silo"):
+        return SILO_META[row["silo"]][0]
+    if row["kind"] == "hub" and row.get("silo") and row.get("hub"):
+        for slug, title, _desc in HUBS.get(row["silo"], []):
+            if slug == row["hub"]:
+                return title
+        return LABELS.get(row["hub"], row["hub"])
+    slug = row.get("sub") or row.get("leaf")
+    if slug:
+        return LABELS.get(slug, slug.replace("-", " ").title())
+    return row["h1"][:60]
+
+
+def render_index_alt_tile(row: dict) -> str:
+    name = index_row_display_name(row)
     search = " ".join(
-        (row["path"], row["h1"], row["title"], page_kind_label(row["kind"]))
+        (row["path"], name, row["h1"], row["title"], page_kind_label(row["kind"]))
     ).lower()
-    short = row["path"]
-    if row["kind"] not in ("home", "silo", "hub"):
-        parts = short.strip("/").split("/")
-        short = parts[-1] + "/" if parts else short
+    cls = "alt-tile ov" if row["overridden"] else "alt-tile"
+    ov = '<span class="badge override">правки</span>' if row["overridden"] else ""
+    edit = url_for("edit", path=row["path"])
     return (
-        f'<li class="{cls}" data-search="{esc(search)}">'
-        f'<div class="idx-page__line">'
-        f'<div class="idx-page__info">'
-        f'<a class="idx-page__path" href="{url_for("edit", path=row["path"])}">'
-        f'{esc(short)}</a>'
-        f'<span class="idx-page__full" title="{esc(row["path"])}">{esc(row["path"])}</span>'
+        f'<a class="{cls}" href="{edit}" data-search="{esc(search)}">'
+        f'<span class="alt-tile__name">{esc(name)}</span>'
+        f'<span class="alt-tile__path">{esc(row["path"])}</span>'
+        f'<span class="alt-tile__meta">'
         f'<span class="badge {esc(row["kind"])}">{esc(page_kind_label(row["kind"]))}</span>'
-        f"{ov_badge}"
-        f"</div>"
-        f'<span class="idx-page__h1" title="{esc(row["h1"])}">{esc(row["h1"])}</span>'
-        f'<a class="btn btn-ghost btn-sm" href="{url_for("edit", path=row["path"])}">'
-        f"Редактировать</a>"
-        f"</div></li>"
+        f"{ov}"
+        f"</span></a>"
     )
 
 
-def render_index_tree_html(home: list[dict], silos: dict[str, dict]) -> str:
-    parts: list[str] = ['<div class="index-tree">']
+def _render_index_alt_hub(silo: str, hub_slug: str, hub_data: dict) -> str:
+    hub_row = hub_data["hub_row"]
+    pages = hub_data["pages"]
+    hub_title = LABELS.get(hub_slug, hub_slug.replace("-", " ").title())
+    for slug, title, _desc in HUBS.get(silo, []):
+        if slug == hub_slug:
+            hub_title = title
+            break
+    tiles = []
+    if hub_row:
+        tiles.append(render_index_alt_tile(hub_row))
+    tiles.extend(render_index_alt_tile(r) for r in pages)
+    return (
+        f'<div class="alt-hub">'
+        f'<h3 class="alt-hub__title">{esc(hub_title)}</h3>'
+        f'<p class="alt-hub__url">/{esc(silo)}/{esc(hub_slug)}/</p>'
+        f'<div class="alt-tiles">{"".join(tiles)}</div>'
+        f"</div>"
+    )
+
+
+def render_index_alt_html(home: list[dict], silos: dict[str, dict]) -> str:
+    """Плитки по разделам — только для html.admin-alt."""
+    parts: list[str] = ['<div class="alt-index">']
+    hub_order = {s: [h[0] for h in hubs] for s, hubs in HUBS.items()}
 
     if home:
         parts.append(
-            '<details class="idx-section" open>'
-            f'<summary><span class="idx-section__title">Главная</span>'
-            f'<span class="idx-count">{len(home)}</span></summary>'
-            '<ul class="idx-pages">'
-            + "".join(render_index_page_li(r) for r in home)
-            + "</ul></details>"
+            '<section class="alt-silo alt-silo--home">'
+            '<h2 class="alt-silo__title">Главная</h2>'
+            f'<div class="alt-tiles">{"".join(render_index_alt_tile(r) for r in home)}</div>'
+            "</section>"
         )
-
-    hub_order = {silo: [h[0] for h in hubs] for silo, hubs in HUBS.items()}
 
     for silo in SILO_META:
         data = silos[silo]
         silo_row = data["silo_row"]
         hubs = data["hubs"]
-        n_pages = (1 if silo_row else 0) + sum(
+        n = (1 if silo_row else 0) + sum(
             (1 if h["hub_row"] else 0) + len(h["pages"]) for h in hubs.values()
         )
-        if not n_pages:
+        if not n:
             continue
-
         silo_title, _ = SILO_META[silo]
         parts.append(
-            f'<details class="idx-section" open>'
-            f'<summary><span class="idx-section__title">{esc(silo_title)}</span>'
-            f'<span class="idx-section__url">/{esc(silo)}/</span>'
-            f'<span class="idx-count">{n_pages}</span></summary>'
+            f'<section class="alt-silo" data-silo="{esc(silo)}">'
+            f'<header class="alt-silo__head">'
+            f'<h2 class="alt-silo__title">{esc(silo_title)}</h2>'
+            f'<span class="alt-silo__url">/{esc(silo)}/</span>'
+            f'<span class="alt-silo__count">{n} стр.</span>'
+            f"</header>"
         )
-
+        top_tiles = []
         if silo_row:
-            parts.append(
-                '<ul class="idx-pages idx-pages--silo">'
-                + render_index_page_li(silo_row)
-                + "</ul>"
-            )
-
-        ordered_hub_slugs = hub_order.get(silo, [])
-        seen = set(ordered_hub_slugs)
-        for hub_slug in ordered_hub_slugs:
-            if hub_slug not in hubs:
-                continue
-            parts.append(_render_index_hub_block(silo, hub_slug, hubs[hub_slug]))
+            top_tiles.append(render_index_alt_tile(silo_row))
+        if top_tiles:
+            parts.append(f'<div class="alt-tiles alt-tiles--l1">{"".join(top_tiles)}</div>')
+        parts.append('<div class="alt-hubs">')
+        seen: set[str] = set()
+        for hub_slug in hub_order.get(silo, []):
+            if hub_slug in hubs:
+                seen.add(hub_slug)
+                parts.append(_render_index_alt_hub(silo, hub_slug, hubs[hub_slug]))
         for hub_slug in sorted(hubs.keys()):
             if hub_slug not in seen:
-                parts.append(_render_index_hub_block(silo, hub_slug, hubs[hub_slug]))
-
-        parts.append("</details>")
+                parts.append(_render_index_alt_hub(silo, hub_slug, hubs[hub_slug]))
+        parts.append("</div></section>")
 
     parts.append("</div>")
     return "".join(parts)
-
-
-def _render_index_hub_block(silo: str, hub_slug: str, hub_data: dict) -> str:
-    hub_row = hub_data["hub_row"]
-    pages = hub_data["pages"]
-    hub_title = LABELS.get(hub_slug, hub_slug.replace("-", " ").title())
-    if hub_row and hub_row["kind"] == "hub":
-        # hub pages from build_pages_list carry title in default_seo via page dict — use LABELS
-        pass
-    for _slug, title, _desc in HUBS.get(silo, []):
-        if _slug == hub_slug:
-            hub_title = title
-            break
-
-    n = (1 if hub_row else 0) + len(pages)
-    inner = ""
-    if hub_row:
-        inner += (
-            '<ul class="idx-pages idx-pages--hub">'
-            + render_index_page_li(hub_row)
-            + "</ul>"
-        )
-    if pages:
-        inner += (
-            '<ul class="idx-pages">'
-            + "".join(render_index_page_li(r) for r in pages)
-            + "</ul>"
-        )
-
-    return (
-        f'<details class="idx-hub">'
-        f'<summary><span class="idx-hub__title">{esc(hub_title)}</span>'
-        f'<span class="idx-hub__url">/{esc(silo)}/{esc(hub_slug)}/</span>'
-        f'<span class="idx-count">{n}</span></summary>'
-        f"{inner}</details>"
-    )
 
 
 INDEX_LIST_JS = r"""
@@ -353,29 +341,26 @@ INDEX_LIST_JS = r"""
 (function () {
   var q = document.getElementById('idx-search');
   if (!q) return;
-  var pages = document.querySelectorAll('.index-tree .idx-page');
+  var tiles = document.querySelectorAll('.alt-index .alt-tile');
+  var hubs = document.querySelectorAll('.alt-index .alt-hub');
+  var silos = document.querySelectorAll('.alt-index .alt-silo');
   function applyFilter() {
     var t = q.value.trim().toLowerCase();
-    pages.forEach(function (el) {
+    tiles.forEach(function (el) {
       var hay = el.getAttribute('data-search') || '';
-      el.classList.toggle('idx-page--hidden', t && hay.indexOf(t) < 0);
+      el.classList.toggle('alt-tile--hidden', !!(t && hay.indexOf(t) < 0));
     });
-    if (t) {
-      document.querySelectorAll('.index-tree details').forEach(function (d) {
-        d.open = true;
-      });
-    }
+    hubs.forEach(function (hub) {
+      var any = hub.querySelector('.alt-tile:not(.alt-tile--hidden)');
+      hub.style.display = (!t || any) ? '' : 'none';
+    });
+    silos.forEach(function (sec) {
+      var any = sec.querySelector('.alt-tile:not(.alt-tile--hidden)');
+      sec.style.display = (!t || any) ? '' : 'none';
+    });
   }
   q.addEventListener('input', applyFilter);
 })();
-function idxExpandAll() {
-  document.querySelectorAll('.index-tree details').forEach(function (d) { d.open = true; });
-}
-function idxCollapseAll() {
-  document.querySelectorAll('.index-tree details').forEach(function (d) { d.open = false; });
-  var home = document.querySelector('.index-tree > .idx-section');
-  if (home) home.open = true;
-}
 </script>
 """
 
@@ -859,7 +844,7 @@ function toggleAltView(){try{var on=document.documentElement.classList.toggle('a
 """
 
 ALT_VIEW_CSS = """
-/* ======== Альтернативный вид (тумблер в шапке) ======== */
+/* ======== Альтернативный вид — только при class admin-alt на <html> ======== */
 .view-toggle {
   font-family: inherit; font-size: 13px; font-weight: 600;
   color: var(--text-muted); background: var(--surface-2);
@@ -869,15 +854,92 @@ ALT_VIEW_CSS = """
 .view-toggle:hover { color: var(--primary); border-color: var(--primary); }
 html.admin-alt .view-toggle { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-/* Список: чуть контрастнее секции */
-html.admin-alt .idx-section > summary { background: #eef2f7; }
-html.admin-alt .idx-page:hover { background: #f0f6ff; }
+.index-view-alt { display: none; }
+.page-meta-alt { display: none; }
+html.admin-alt .index-view-default { display: none !important; }
+html.admin-alt .page-meta-default { display: none; }
+html.admin-alt .index-view-alt { display: block; }
+html.admin-alt .page-meta-alt { display: block; }
 
-/* Форма редактирования: уже и спокойнее, блоки на сером фоне */
+/* Список: панель поиска */
+html.admin-alt .index-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+}
+html.admin-alt .idx-search {
+  flex: 1; min-width: 200px; max-width: 420px;
+  font: inherit; font-size: 14px; padding: 10px 14px;
+  border: 1px solid var(--border-strong); border-radius: 8px;
+}
+html.admin-alt .idx-search:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+html.admin-alt .index-toolbar__hint {
+  font-size: 12px; color: var(--text-muted);
+}
+
+/* Разделы сайта — карточки */
+html.admin-alt .alt-index { display: flex; flex-direction: column; gap: 20px; }
+html.admin-alt .alt-silo {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px 18px;
+  box-shadow: var(--shadow-sm);
+}
+html.admin-alt .alt-silo__head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+}
+html.admin-alt .alt-silo__title { margin: 0; font-size: 17px; font-weight: 700; flex: 1; }
+html.admin-alt .alt-silo__url {
+  font-family: var(--mono); font-size: 12px; color: var(--text-muted);
+}
+html.admin-alt .alt-silo__count {
+  font-size: 12px; font-weight: 600; color: var(--primary);
+  background: #eff6ff; padding: 4px 10px; border-radius: 999px;
+}
+html.admin-alt .alt-hubs {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px; margin-top: 12px;
+}
+html.admin-alt .alt-hub {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+}
+html.admin-alt .alt-hub__title { margin: 0 0 4px; font-size: 14px; font-weight: 700; }
+html.admin-alt .alt-hub__url {
+  margin: 0 0 10px; font-family: var(--mono); font-size: 11px;
+  color: var(--text-soft);
+}
+html.admin-alt .alt-tiles {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+html.admin-alt .alt-tiles--l1 { margin-bottom: 12px; }
+html.admin-alt .alt-tile {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 12px; text-decoration: none; color: inherit;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; min-height: 72px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+html.admin-alt .alt-tile:hover {
+  border-color: var(--primary); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  text-decoration: none;
+}
+html.admin-alt .alt-tile.ov { border-color: #fcd34d; background: #fffbeb; }
+html.admin-alt .alt-tile--hidden { display: none !important; }
+html.admin-alt .alt-tile__name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+html.admin-alt .alt-tile__path {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  word-break: break-all; line-height: 1.35;
+}
+html.admin-alt .alt-tile__meta { margin-top: auto; display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* Форма редактирования */
 html.admin-alt .editor { max-width: 880px; }
 html.admin-alt .block { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; }
-
-/* Таблица-виджет: ровные ячейки с границами */
 html.admin-alt table.tbl-edit { border-collapse: collapse; border-spacing: 0; width: 100%; table-layout: fixed; }
 html.admin-alt table.tbl-edit th,
 html.admin-alt table.tbl-edit td { padding: 0; border: 1px solid var(--border); }
@@ -1057,141 +1119,7 @@ a:hover {{ text-decoration: underline; }}
 .block-ctrls .bc-del:hover {{ background: #fee2e2; color: var(--danger); border-color: #fecaca; }}
 template {{ display: none; }}
 
-/* ---- Список страниц: дерево по разделам ---- */
-.index-toolbar {{
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-}}
-.idx-search {{
-  flex: 1;
-  min-width: 220px;
-  max-width: 480px;
-  font: inherit;
-  font-size: 14px;
-  padding: 10px 14px;
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  background: var(--surface);
-}}
-.idx-search:focus {{
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}}
-.index-card {{ padding: 0; }}
-.index-tree {{ padding: 8px 0; }}
-.idx-section, .idx-hub {{
-  border-bottom: 1px solid var(--border);
-}}
-.idx-section:last-child {{ border-bottom: 0; }}
-.idx-section > summary, .idx-hub > summary {{
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  padding: 12px 18px;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--surface-2);
-  user-select: none;
-}}
-.idx-section > summary::-webkit-details-marker,
-.idx-hub > summary::-webkit-details-marker {{ display: none; }}
-.idx-section > summary::before, .idx-hub > summary::before {{
-  content: "▸";
-  color: var(--text-soft);
-  font-size: 11px;
-  width: 14px;
-  flex-shrink: 0;
-}}
-.idx-section[open] > summary::before, .idx-hub[open] > summary::before {{
-  content: "▾";
-}}
-.idx-hub > summary {{
-  padding: 10px 18px 10px 32px;
-  background: var(--surface);
-  font-size: 13px;
-  font-weight: 600;
-}}
-.idx-section__title, .idx-hub__title {{ flex: 1; min-width: 120px; }}
-.idx-section__url, .idx-hub__url {{
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-}}
-.idx-count {{
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 2px 9px;
-  margin-left: auto;
-}}
-.idx-pages {{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}}
-.idx-pages--silo {{ background: #fafbfc; }}
-.idx-page {{ border-top: 1px solid var(--border); }}
-.idx-page--hidden {{ display: none !important; }}
-.idx-page.ov {{ background: #fffaf0; }}
-.idx-page__line {{
-  display: grid;
-  grid-template-columns: minmax(200px, 1.2fr) minmax(120px, 2fr) auto;
-  gap: 12px 16px;
-  align-items: center;
-  padding: 10px 18px 10px 46px;
-}}
-.idx-pages--silo .idx-page__line {{ padding-left: 32px; }}
-.idx-pages--hub .idx-page__line {{ padding-left: 40px; }}
-.idx-page__info {{
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}}
-.idx-page__path {{
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--primary);
-  text-decoration: none;
-}}
-.idx-page__path:hover {{ text-decoration: underline; }}
-.idx-page__full {{
-  display: none;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-soft);
-  width: 100%;
-}}
-.idx-page__h1 {{
-  font-size: 13px;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}}
-.idx-page .btn {{ flex-shrink: 0; }}
-@media (max-width: 800px) {{
-  .idx-page__line {{
-    grid-template-columns: 1fr auto;
-  }}
-  .idx-page__h1 {{ display: none; }}
-  .idx-page__full {{ display: block; }}
-}}
-
-/* ---- Таблица (legacy, если понадобится) ---- */
+/* ---- Таблица ---- */
 .card {{
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1637,6 +1565,24 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
     rows = [index_row_from_page(page, overrides) for page in pages]
     home, silos = build_index_tree(rows)
 
+    rows_html = []
+    for r in rows:
+        ov_badge = '<span class="badge override">правки</span>' if r["overridden"] else ""
+        cls = ' class="ov"' if r["overridden"] else ""
+        rows_html.append(
+            f'<tr{cls}>'
+            f'<td><div class="path-cell">'
+            f'<span class="path">{esc(r["path"])}</span>'
+            f'<span class="badge {esc(r["kind"])}">{esc(page_kind_label(r["kind"]))}</span>'
+            f'{ov_badge}'
+            f'</div></td>'
+            f'<td><span class="truncate" title="{esc(r["h1"])}">{esc(r["h1"])}</span></td>'
+            f'<td class="col-title-td"><span class="truncate muted" title="{esc(r["title"])}">{esc(r["title"])}</span></td>'
+            f'<td class="col-actions">'
+            f'<a class="btn btn-ghost btn-sm" href="{url_for("edit", path=r["path"])}">Редактировать</a></td>'
+            f'</tr>'
+        )
+
     flash = ""
     if saved:
         flash = f'Сохранено и опубликовано: <span class="path">{esc(saved)}</span>'
@@ -1647,20 +1593,32 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
     overridden_n = sum(1 for r in rows if r["overridden"])
     body = (
         f'<h1>SEO-страницы лендинга</h1>'
-        f'<p class="page-meta">Всего: <b>{total}</b> · с правками: <b>{overridden_n}</b> · '
-        f'сгруппировано по разделам сайта</p>'
+        f'<p class="page-meta page-meta-default">Всего страниц: <b>{total}</b> · '
+        f'с переопределённым SEO: <b>{overridden_n}</b></p>'
+        f'<p class="page-meta page-meta-alt">Альтернативный вид: разделы и плитки · '
+        f'всего <b>{total}</b> · с правками <b>{overridden_n}</b></p>'
+        f'<div class="index-view-default">'
+        f'<div class="card">'
+        f'<table class="list">'
+        f'<colgroup>'
+        f'<col class="col-path">'
+        f'<col class="col-h1">'
+        f'<col class="col-title">'
+        f'<col class="col-action">'
+        f'</colgroup>'
+        f'<thead><tr><th>Путь</th><th>H1</th><th class="col-title-th">Title</th><th></th></tr></thead>'
+        f'<tbody>' + "".join(rows_html) + '</tbody>'
+        f'</table></div>'
+        f'</div>'
+        f'<div class="index-view-alt">'
         f'<div class="index-toolbar">'
         f'<input type="search" id="idx-search" class="idx-search" '
-        f'placeholder="Поиск: URL, заголовок, раздел…" autocomplete="off">'
-        f'<button type="button" class="btn btn-ghost btn-sm" onclick="idxExpandAll()">'
-        f"Развернуть всё</button>"
-        f'<button type="button" class="btn btn-ghost btn-sm" onclick="idxCollapseAll()">'
-        f"Свернуть</button>"
-        f"</div>"
-        f'<div class="card index-card">'
-        f"{render_index_tree_html(home, silos)}"
-        f"</div>"
+        f'placeholder="Найти страницу: название, URL…" autocomplete="off">'
+        f'<span class="index-toolbar__hint">Клик по плитке — редактирование</span>'
+        f'</div>'
+        f"{render_index_alt_html(home, silos)}"
         f"{INDEX_LIST_JS}"
+        f"</div>"
     )
     return layout("SEO-страницы", body, flash)
 
