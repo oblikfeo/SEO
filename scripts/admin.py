@@ -211,18 +211,57 @@ def section_tuple_to_dict(sec) -> dict:
     return {"type": "unknown"}
 
 
+# Единый набор блоков по уровню страницы (чтобы все L1/L2/L3/L4 были
+# одинаковыми и одинаково редактировались в админке). Карточки навигации и
+# блок «Связанные» добавляются движком автоматически и здесь не указываются.
+LEVEL_SKELETON = {
+    "silo": ["snippet", "prose", "trial"],
+    "hub": ["snippet", "prose", "table", "trial", "faq"],
+    "leaf": ["snippet", "prose", "howto", "trial", "faq", "table"],
+    "sub": ["snippet", "prose", "howto", "trial", "faq", "table"],
+}
+
+# Блоки, которые можно добавлять/удалять/двигать в админке.
+ADDABLE_BLOCKS = ["snippet", "prose", "howto", "trial", "faq", "table"]
+
+ADD_BLOCK_LABELS = {
+    "snippet": "Сниппет",
+    "prose": "Текст",
+    "howto": "Шаги Happ",
+    "trial": "Тест 8 часов",
+    "faq": "FAQ",
+    "table": "Таблица",
+}
+
+
+def empty_block(t: str) -> dict:
+    """Пустой блок выбранного типа для стартового шаблона/добавления."""
+    if t == "snippet":
+        return {"type": "snippet", "text": ""}
+    if t == "prose":
+        return {"type": "prose", "html": ""}
+    if t == "howto":
+        return {"type": "howto", "items": []}
+    if t == "trial":
+        return {"type": "trial"}
+    if t == "faq":
+        return {"type": "faq", "items": [{"q": "", "a": ""}, {"q": "", "a": ""}]}
+    if t == "table":
+        return {"type": "table", "headers": ["", ""], "rows": [["", ""], ["", ""]]}
+    return {"type": t}
+
+
 def default_sections_for_editing(page: dict) -> list[dict]:
     path = page["path"]
     if path == "/":
         return [section_tuple_to_dict(s) for s in HOME["sections"]]
     if path in CONTENT:
         return [section_tuple_to_dict(s) for s in CONTENT[path]["sections"]]
-    # Заглушки: пустой стартовый шаблон, чтобы можно было добавить текст.
-    return [
-        {"type": "snippet", "text": ""},
-        {"type": "prose", "html": ""},
-        {"type": "faq", "items": [{"q": "", "a": ""}, {"q": "", "a": ""}]},
-    ]
+    # Единый по уровню скелет: одинаковый набор блоков для всех страниц
+    # этого уровня. СЕО-специалист заполняет их текстом в админке.
+    kind = page.get("kind", "leaf")
+    skeleton = LEVEL_SKELETON.get(kind, LEVEL_SKELETON["leaf"])
+    return [empty_block(t) for t in skeleton]
 
 
 def editor_sections(page: dict) -> list[dict]:
@@ -712,6 +751,44 @@ a:hover {{ text-decoration: underline; }}
 }}
 .admin-critical-banner strong {{ color: #78350f; }}
 
+.add-bar {{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+}}
+.add-bar__label {{
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-right: 4px;
+}}
+.block-ctrls {{
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 8px;
+}}
+.block-ctrls .bc {{
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+  font-size: 13px;
+  padding: 0;
+}}
+.block-ctrls .bc:hover {{ background: var(--surface-2); color: var(--text); }}
+.block-ctrls .bc-del:hover {{ background: #fee2e2; color: var(--danger); border-color: #fecaca; }}
+template {{ display: none; }}
+
 /* ---- Таблица ---- */
 .card {{
   background: var(--surface);
@@ -1179,6 +1256,77 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
     return layout("SEO-страницы", body, flash)
 
 
+EDIT_JS = r"""
+<script>
+(function () {
+  var form = document.querySelector('form.editor');
+  if (!form) return;
+  var blocks = form.querySelector('.blocks');
+  var countEl = form.querySelector('input[name=sections_count]');
+  if (!blocks || !countEl) return;
+
+  function renumber() {
+    var list = blocks.querySelectorAll(':scope > .block');
+    list.forEach(function (b, k) {
+      b.querySelectorAll('[name]').forEach(function (el) {
+        el.name = el.name.replace(/^s_\d+_/, 's_' + k + '_');
+      });
+      var num = b.querySelector('.section-num');
+      if (num) num.textContent = '#' + (k + 1);
+    });
+    countEl.value = list.length;
+  }
+
+  function addControls(b) {
+    if (b.querySelector('.block-ctrls')) return;
+    var head = b.querySelector('.block-head');
+    if (!head) return;
+    var box = document.createElement('span');
+    box.className = 'block-ctrls';
+    box.innerHTML =
+      '<button type="button" class="bc" data-act="up" title="Поднять выше">&#8593;</button>' +
+      '<button type="button" class="bc" data-act="down" title="Опустить ниже">&#8595;</button>' +
+      '<button type="button" class="bc bc-del" data-act="del" title="Удалить блок">&#10005;</button>';
+    head.appendChild(box);
+  }
+
+  blocks.querySelectorAll(':scope > .block').forEach(addControls);
+
+  blocks.addEventListener('click', function (e) {
+    var btn = e.target.closest('.bc');
+    if (!btn) return;
+    var b = btn.closest('.block');
+    var act = btn.getAttribute('data-act');
+    if (act === 'up' && b.previousElementSibling) {
+      blocks.insertBefore(b, b.previousElementSibling);
+    } else if (act === 'down' && b.nextElementSibling) {
+      blocks.insertBefore(b.nextElementSibling, b);
+    } else if (act === 'del') {
+      if (confirm('Удалить этот блок со страницы?')) b.remove();
+    }
+    renumber();
+  });
+
+  document.querySelectorAll('.add-block').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var t = btn.getAttribute('data-type');
+      var tpl = document.querySelector('template.block-tpl[data-type="' + t + '"]');
+      if (!tpl) return;
+      var node = tpl.content.firstElementChild.cloneNode(true);
+      blocks.appendChild(node);
+      addControls(node);
+      renumber();
+      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+
+  form.addEventListener('submit', renumber);
+  renumber();
+})();
+</script>
+"""
+
+
 def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
     path = page["path"]
     ov_title = ov.get("title") or ""
@@ -1204,6 +1352,23 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
     # Контент-блоки
     secs = editor_sections(page)
     widgets = "".join(render_section_widget(i, s) for i, s in enumerate(secs))
+
+    addbar = (
+        '<div class="add-bar">'
+        '<span class="add-bar__label">Добавить блок:</span>'
+        + "".join(
+            f'<button type="button" class="btn btn-ghost btn-sm add-block" '
+            f'data-type="{esc(t)}">+ {esc(ADD_BLOCK_LABELS[t])}</button>'
+            for t in ADDABLE_BLOCKS
+        )
+        + "</div>"
+    )
+
+    templates_html = "".join(
+        f'<template class="block-tpl" data-type="{esc(t)}">'
+        f"{render_section_widget(0, empty_block(t))}</template>"
+        for t in ADDABLE_BLOCKS
+    )
 
     body = f"""
 <h1>Редактирование страницы</h1>
@@ -1239,7 +1404,8 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
   </div>
 
   <h2 class="section-h">Контент страницы</h2>
-  <p class="section-note">Блоки идут сверху вниз в том же порядке, что и на сайте. Карточки и блок «Бесплатный тест» правятся в коде. Кнопка «Сбросить к дефолту» уберёт ваши правки и вернёт страницу к исходному состоянию из <span class="path">site_data.py</span>.</p>
+  <p class="section-note">Блоки идут сверху вниз в том же порядке, что и на сайте. Кнопками справа от заголовка блока можно поднять/опустить/удалить блок, а панелью «Добавить блок» — добавить новый. Карточки навигации формируются автоматически. «Сбросить к дефолту» вернёт страницу к стартовому шаблону уровня.</p>
+  {addbar}
   <div class="blocks">
     {widgets}
   </div>
@@ -1251,6 +1417,8 @@ def render_edit(page: dict, seo: dict, ov: dict, error: str = "") -> str:
     {reset_form}
   </div>
 </form>
+{templates_html}
+{EDIT_JS}
 """
     return layout(f"Редактирование {path}", body)
 
