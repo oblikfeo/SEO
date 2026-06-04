@@ -509,28 +509,45 @@ def render_section_widget(i: int, section: dict) -> str:
         headers = list(section.get("headers") or [])
         rows = list(section.get("rows") or [])
         cols = len(headers)
+        if cols == 0:
+            cols = 2
+            headers = ["", ""]
         rows = [list(r) + [""] * max(0, cols - len(r)) for r in rows]
         rows_n = len(rows)
-        style = f"grid-template-columns: repeat({max(cols, 1)}, minmax(0, 1fr));"
-        grid = [f'<div class="table-grid" style="{style}">']
-        for c, h in enumerate(headers):
-            grid.append(
-                f'<input type="text" name="s_{i}_h_{c}" value="{esc(h)}" class="th" placeholder="Заголовок {c + 1}">'
-            )
+        thead_cells = "".join(
+            f'<th><input type="text" name="s_{i}_h_{c}" value="{esc(headers[c])}" '
+            f'class="th" placeholder="Заголовок {c + 1}"></th>'
+            for c in range(cols)
+        )
+        tbody_rows = []
         for r in range(rows_n):
-            for c in range(cols):
-                grid.append(
-                    f'<input type="text" name="s_{i}_cell_{r}_{c}" value="{esc(rows[r][c])}">'
-                )
-        grid.append("</div>")
+            tds = "".join(
+                f'<td><input type="text" name="s_{i}_cell_{r}_{c}" value="{esc(rows[r][c])}"></td>'
+                for c in range(cols)
+            )
+            tbody_rows.append(f"<tr>{tds}</tr>")
         return f"""
 <section class="block block--table">
-  <header class="block-head">{num}<span class="block-title">Таблица ({rows_n} × {cols})</span>
-  <span class="block-hint">Пустые строки пропускаются</span></header>
+  <header class="block-head">{num}<span class="block-title">Таблица (<span class="tbl-size">{rows_n} × {cols}</span>)</span>
+  <span class="block-hint">Пустые строки пропускаются. Размер меняйте кнопками ниже.</span></header>
   {hidden_type}
-  <input type="hidden" name="s_{i}_cols" value="{cols}">
-  <input type="hidden" name="s_{i}_rows" value="{rows_n}">
-  {"".join(grid)}
+  <div class="tbl-wrap">
+    <input type="hidden" name="s_{i}_cols" value="{cols}">
+    <input type="hidden" name="s_{i}_rows" value="{rows_n}">
+    <div class="tbl-scroll">
+      <table class="tbl-edit">
+        <thead><tr>{thead_cells}</tr></thead>
+        <tbody>{"".join(tbody_rows)}</tbody>
+      </table>
+    </div>
+    <div class="tbl-tools">
+      <button type="button" class="btn btn-ghost btn-sm" data-tbl="add-row">+ строка</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-tbl="del-row">− строка</button>
+      <span class="tbl-tools-sep"></span>
+      <button type="button" class="btn btn-ghost btn-sm" data-tbl="add-col">+ столбец</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-tbl="del-col">− столбец</button>
+    </div>
+  </div>
 </section>"""
 
     if t == "cards":
@@ -1134,6 +1151,41 @@ table.list td .path-cell .path {{
   background: var(--surface);
   border-color: var(--border-strong);
 }}
+.tbl-wrap {{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+}}
+.tbl-scroll {{ overflow-x: auto; }}
+table.tbl-edit {{ border-collapse: separate; border-spacing: 8px; width: 100%; }}
+table.tbl-edit th, table.tbl-edit td {{ padding: 0; }}
+table.tbl-edit input[type=text] {{
+  width: 100%;
+  min-width: 120px;
+  box-sizing: border-box;
+  background: var(--surface-2);
+}}
+table.tbl-edit input[type=text].th {{
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border-strong);
+}}
+.tbl-tools {{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}}
+.tbl-tools-sep {{
+  width: 1px;
+  align-self: stretch;
+  min-height: 20px;
+  background: var(--border-strong);
+  margin: 0 2px;
+}}
 
 /* Cards preview */
 .cards-preview {{
@@ -1292,7 +1344,69 @@ EDIT_JS = r"""
 
   blocks.querySelectorAll(':scope > .block').forEach(addControls);
 
+  function tablePrefix(wrap) {
+    var colsEl = wrap.querySelector('input[name$="_cols"]');
+    return colsEl ? colsEl.name.replace(/cols$/, '') : 's_0_';
+  }
+
+  function updateTableSize(wrap) {
+    var cols = parseInt(wrap.querySelector('input[name$="_cols"]').value, 10) || 0;
+    var rows = parseInt(wrap.querySelector('input[name$="_rows"]').value, 10) || 0;
+    var label = wrap.closest('.block').querySelector('.tbl-size');
+    if (label) label.textContent = rows + ' × ' + cols;
+  }
+
+  function handleTable(btn) {
+    var wrap = btn.closest('.tbl-wrap');
+    if (!wrap) return;
+    var table = wrap.querySelector('table.tbl-edit');
+    var thead = table.tHead.rows[0];
+    var tbody = table.tBodies[0];
+    var colsEl = wrap.querySelector('input[name$="_cols"]');
+    var rowsEl = wrap.querySelector('input[name$="_rows"]');
+    var cols = parseInt(colsEl.value, 10) || 0;
+    var rows = parseInt(rowsEl.value, 10) || 0;
+    var pfx = tablePrefix(wrap);
+    var act = btn.getAttribute('data-tbl');
+
+    if (act === 'add-row') {
+      var tr = document.createElement('tr');
+      var html = '';
+      for (var c = 0; c < cols; c++) {
+        html += '<td><input type="text" name="' + pfx + 'cell_' + rows + '_' + c + '"></td>';
+      }
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+      rowsEl.value = rows + 1;
+    } else if (act === 'del-row') {
+      if (rows <= 1) return;
+      if (tbody.rows.length) tbody.deleteRow(-1);
+      rowsEl.value = rows - 1;
+    } else if (act === 'add-col') {
+      var th = document.createElement('th');
+      th.innerHTML = '<input type="text" class="th" name="' + pfx + 'h_' + cols +
+        '" placeholder="Заголовок ' + (cols + 1) + '">';
+      thead.appendChild(th);
+      Array.prototype.forEach.call(tbody.rows, function (row, r) {
+        var td = document.createElement('td');
+        td.innerHTML = '<input type="text" name="' + pfx + 'cell_' + r + '_' + cols + '">';
+        row.appendChild(td);
+      });
+      colsEl.value = cols + 1;
+    } else if (act === 'del-col') {
+      if (cols <= 1) return;
+      thead.deleteCell(-1);
+      Array.prototype.forEach.call(tbody.rows, function (row) {
+        if (row.cells.length) row.deleteCell(-1);
+      });
+      colsEl.value = cols - 1;
+    }
+    updateTableSize(wrap);
+  }
+
   blocks.addEventListener('click', function (e) {
+    var tbl = e.target.closest('.tbl-tools button');
+    if (tbl) { handleTable(tbl); return; }
     var btn = e.target.closest('.bc');
     if (!btn) return;
     var b = btn.closest('.block');
