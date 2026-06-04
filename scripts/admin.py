@@ -286,16 +286,20 @@ def _render_index_alt_hub(silo: str, hub_slug: str, hub_data: dict) -> str:
 
 
 def render_index_alt_html(home: list[dict], silos: dict[str, dict]) -> str:
-    """Плитки по разделам — только для html.admin-alt."""
+    """Плитки по разделам — только для html.admin-alt. Разделы свёрнуты по умолчанию."""
     parts: list[str] = ['<div class="alt-index">']
     hub_order = {s: [h[0] for h in hubs] for s, hubs in HUBS.items()}
 
     if home:
         parts.append(
-            '<section class="alt-silo alt-silo--home">'
-            '<h2 class="alt-silo__title">Главная</h2>'
+            '<details class="alt-silo alt-silo--home">'
+            '<summary class="alt-silo__head">'
+            '<span class="alt-silo__title">Главная</span>'
+            f'<span class="alt-silo__count">{len(home)} стр.</span>'
+            "</summary>"
+            f'<div class="alt-silo__body">'
             f'<div class="alt-tiles">{"".join(render_index_alt_tile(r) for r in home)}</div>'
-            "</section>"
+            "</div></details>"
         )
 
     for silo in SILO_META:
@@ -308,29 +312,35 @@ def render_index_alt_html(home: list[dict], silos: dict[str, dict]) -> str:
         if not n:
             continue
         silo_title, _ = SILO_META[silo]
-        parts.append(
-            f'<section class="alt-silo" data-silo="{esc(silo)}">'
-            f'<header class="alt-silo__head">'
-            f'<h2 class="alt-silo__title">{esc(silo_title)}</h2>'
-            f'<span class="alt-silo__url">/{esc(silo)}/</span>'
-            f'<span class="alt-silo__count">{n} стр.</span>'
-            f"</header>"
-        )
+        body_parts: list[str] = ['<div class="alt-silo__body">']
         top_tiles = []
         if silo_row:
             top_tiles.append(render_index_alt_tile(silo_row))
         if top_tiles:
-            parts.append(f'<div class="alt-tiles alt-tiles--l1">{"".join(top_tiles)}</div>')
-        parts.append('<div class="alt-hubs">')
+            body_parts.append(
+                f'<div class="alt-tiles alt-tiles--l1">{"".join(top_tiles)}</div>'
+            )
+        body_parts.append('<div class="alt-hubs">')
         seen: set[str] = set()
         for hub_slug in hub_order.get(silo, []):
             if hub_slug in hubs:
                 seen.add(hub_slug)
-                parts.append(_render_index_alt_hub(silo, hub_slug, hubs[hub_slug]))
+                body_parts.append(_render_index_alt_hub(silo, hub_slug, hubs[hub_slug]))
         for hub_slug in sorted(hubs.keys()):
             if hub_slug not in seen:
-                parts.append(_render_index_alt_hub(silo, hub_slug, hubs[hub_slug]))
-        parts.append("</div></section>")
+                body_parts.append(_render_index_alt_hub(silo, hub_slug, hubs[hub_slug]))
+        body_parts.append("</div></div>")
+
+        parts.append(
+            f'<details class="alt-silo" data-silo="{esc(silo)}">'
+            f'<summary class="alt-silo__head">'
+            f'<span class="alt-silo__title">{esc(silo_title)}</span>'
+            f'<span class="alt-silo__url">/{esc(silo)}/</span>'
+            f'<span class="alt-silo__count">{n} стр.</span>'
+            f"</summary>"
+            + "".join(body_parts)
+            + "</details>"
+        )
 
     parts.append("</div>")
     return "".join(parts)
@@ -343,7 +353,7 @@ INDEX_LIST_JS = r"""
   if (!q) return;
   var tiles = document.querySelectorAll('.alt-index .alt-tile');
   var hubs = document.querySelectorAll('.alt-index .alt-hub');
-  var silos = document.querySelectorAll('.alt-index .alt-silo');
+  var silos = document.querySelectorAll('.alt-index details.alt-silo');
   function applyFilter() {
     var t = q.value.trim().toLowerCase();
     tiles.forEach(function (el) {
@@ -354,13 +364,28 @@ INDEX_LIST_JS = r"""
       var any = hub.querySelector('.alt-tile:not(.alt-tile--hidden)');
       hub.style.display = (!t || any) ? '' : 'none';
     });
-    silos.forEach(function (sec) {
-      var any = sec.querySelector('.alt-tile:not(.alt-tile--hidden)');
-      sec.style.display = (!t || any) ? '' : 'none';
+    silos.forEach(function (det) {
+      var any = det.querySelector('.alt-tile:not(.alt-tile--hidden)');
+      if (t) {
+        det.open = !!any;
+        det.style.display = any ? '' : 'none';
+      } else {
+        det.style.display = '';
+      }
     });
   }
   q.addEventListener('input', applyFilter);
 })();
+function altExpandSections() {
+  document.querySelectorAll('.alt-index details.alt-silo').forEach(function (d) {
+    d.open = true;
+  });
+}
+function altCollapseSections() {
+  document.querySelectorAll('.alt-index details.alt-silo').forEach(function (d) {
+    d.open = false;
+  });
+}
 </script>
 """
 
@@ -879,19 +904,29 @@ html.admin-alt .index-toolbar__hint {
   font-size: 12px; color: var(--text-muted);
 }
 
-/* Разделы сайта — карточки */
-html.admin-alt .alt-index { display: flex; flex-direction: column; gap: 20px; }
-html.admin-alt .alt-silo {
+/* Разделы сайта — сворачиваемые блоки */
+html.admin-alt .alt-index { display: flex; flex-direction: column; gap: 10px; }
+html.admin-alt details.alt-silo {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px 18px 18px;
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden;
 }
-html.admin-alt .alt-silo__head {
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
-  margin-bottom: 14px; padding-bottom: 12px;
+html.admin-alt details.alt-silo > summary {
+  list-style: none; cursor: pointer; user-select: none;
+}
+html.admin-alt details.alt-silo > summary::-webkit-details-marker { display: none; }
+html.admin-alt summary.alt-silo__head {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  padding: 14px 18px; background: var(--surface-2);
+}
+html.admin-alt summary.alt-silo__head::before {
+  content: "▸"; color: var(--text-soft); font-size: 12px; width: 14px;
+}
+html.admin-alt details.alt-silo[open] > summary.alt-silo__head::before { content: "▾"; }
+html.admin-alt details.alt-silo[open] > summary.alt-silo__head {
   border-bottom: 2px solid var(--primary);
 }
-html.admin-alt .alt-silo__title { margin: 0; font-size: 17px; font-weight: 700; flex: 1; }
+html.admin-alt .alt-silo__body { padding: 14px 18px 18px; }
+html.admin-alt .alt-silo__title { font-size: 16px; font-weight: 700; flex: 1; }
 html.admin-alt .alt-silo__url {
   font-family: var(--mono); font-size: 12px; color: var(--text-muted);
 }
@@ -1614,7 +1649,11 @@ def render_index(saved: str | None = None, reset: str | None = None) -> str:
         f'<div class="index-toolbar">'
         f'<input type="search" id="idx-search" class="idx-search" '
         f'placeholder="Найти страницу: название, URL…" autocomplete="off">'
-        f'<span class="index-toolbar__hint">Клик по плитке — редактирование</span>'
+        f'<button type="button" class="btn btn-ghost btn-sm" onclick="altExpandSections()">'
+        f"Развернуть разделы</button>"
+        f'<button type="button" class="btn btn-ghost btn-sm" onclick="altCollapseSections()">'
+        f"Свернуть разделы</button>"
+        f'<span class="index-toolbar__hint">Разделы свёрнуты · клик по заголовку или плитке</span>'
         f'</div>'
         f"{render_index_alt_html(home, silos)}"
         f"{INDEX_LIST_JS}"
