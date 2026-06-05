@@ -88,11 +88,16 @@
   padding: 9px 12px;
   border: 2px solid var(--mock-dark);
   background: #fff;
+  box-shadow: 3px 3px 0 var(--mock-dark);
   letter-spacing: 0.04em;
   white-space: nowrap;
   flex-shrink: 0;
 }
-.lp-f1 .lp-login-btn:hover { background: var(--mock-dark); color: #fff; }
+.lp-f1 .lp-login-btn:hover {
+  background: var(--mock-dark);
+  color: #fff;
+  box-shadow: 0 0 0 var(--mock-dark);
+}
 
 .lp-f1 .lp-header-cta {
   font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
@@ -118,13 +123,29 @@
 /* Кнопка-гамбургер: видна только на узких экранах (база скрыта в lp-header-views2.css) */
 .lp-f1 .lp-nav-toggle { display: none; }
 
-/* Мобильное меню: гамбургер + выпадающая навигация (drawer), а не растянутый список */
+/* Мобильное меню: бренд слева, справа ровная группа «Войти / Регистрация / бургер»,
+   навигация — выпадающим списком (drawer). Префикс .lp-header--drawer повышает
+   специфичность, чтобы перекрыть правила старого лендинга (lp-views2-responsive.css). */
 @media (max-width: 900px) {
-  .lp-f1 .lp-header__bar { flex-wrap: wrap; }
-  .lp-f1 .lp-nav-toggle { display: inline-flex; order: 4; margin-left: 4px; }
-  .lp-f1 .lp-login-btn { order: 2; }
-  .lp-f1 .lp-header-cta { order: 3; }
-  .lp-f1 .lp-header__nav {
+  .lp-f1 .lp-header--drawer .lp-header__bar {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+  }
+  .lp-f1 .lp-header--drawer .lp-brand-line {
+    flex: 0 1 auto;
+    margin-right: auto;
+  }
+  .lp-f1 .lp-header--drawer .lp-login-btn { order: 2; margin-left: 0; }
+  .lp-f1 .lp-header--drawer .lp-header-cta { order: 3; margin-left: 0; }
+  .lp-f1 .lp-header--drawer .lp-nav-toggle {
+    order: 4;
+    display: inline-flex;
+    margin-left: 0;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 var(--mock-dark);
+  }
+  .lp-f1 .lp-header--drawer .lp-header__nav {
     order: 5;
     flex-basis: 100%;
     width: 100%;
@@ -136,14 +157,14 @@
     padding-top: 8px;
     border-top: 2px dashed rgba(0, 0, 0, 0.12);
   }
-  .lp-f1 .lp-header__nav.lp-header__nav--open { display: flex; }
-  .lp-f1 .lp-header__nav a {
+  .lp-f1 .lp-header--drawer .lp-header__nav.lp-header__nav--open { display: flex; }
+  .lp-f1 .lp-header--drawer .lp-header__nav a {
     padding: 12px 10px;
     font-size: 13px;
     border: none;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
-  .lp-f1 .lp-header__nav a:last-child { border-bottom: none; }
+  .lp-f1 .lp-header--drawer .lp-header__nav a:last-child { border-bottom: none; }
 }
 @media (max-width: 480px) {
   .lp-f1 .lp-header-cta { font-size: 11px; padding: 8px 10px; }
