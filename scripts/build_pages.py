@@ -320,13 +320,35 @@ def header_html(cfg: dict, depth: int, active_silo: str | None) -> str:
         f'<span class="lp-logo-heavy">{brand}</span>'
         f'<span class="lp-logo-vpn">{attr(cfg["brand_vpn"])}</span>'
         "</a>"
-        '<nav class="lp-header__nav" aria-label="Основная навигация">'
+        '<button type="button" class="lp-nav-toggle" aria-label="Меню" '
+        'aria-controls="lp-primary-nav" aria-expanded="false">'
+        '<span class="lp-nav-toggle__bars" aria-hidden="true"></span>'
+        "</button>"
+        '<nav class="lp-header__nav" id="lp-primary-nav" aria-label="Основная навигация">'
         + "".join(links)
         + "</nav>"
         f'<a href="{attr(login)}" class="lp-login-btn">Войти</a>'
         f'<a href="{attr(reg)}" class="lp-header-cta" data-page="header">Регистрация</a>'
         "</div></header>"
     )
+
+
+NAV_TOGGLE_JS = (
+    "<script>(function(){"
+    "var t=document.querySelector('.lp-nav-toggle');"
+    "var n=document.getElementById('lp-primary-nav');"
+    "if(!t||!n){return;}"
+    "t.addEventListener('click',function(){"
+    "var open=n.classList.toggle('lp-header__nav--open');"
+    "t.setAttribute('aria-expanded',open?'true':'false');"
+    "});"
+    "n.addEventListener('click',function(e){"
+    "if(e.target.closest('a')){"
+    "n.classList.remove('lp-header__nav--open');"
+    "t.setAttribute('aria-expanded','false');"
+    "}});"
+    "})();</script>"
+)
 
 
 def footer_html(cfg: dict, depth: int, slug: str) -> str:
@@ -820,7 +842,9 @@ def page_shell(
         + main_html
         + "</main>"
         + footer_html(cfg, depth, slug)
-        + "</div></div></body></html>"
+        + "</div></div>"
+        + NAV_TOGGLE_JS
+        + "</body></html>"
     )
 
 

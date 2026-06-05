@@ -115,10 +115,35 @@
   box-shadow: 0 0 0 var(--mock-dark);
 }
 
-/* Мобильное меню: на узких экранах nav переносится на следующую строку */
+/* Кнопка-гамбургер: видна только на узких экранах (база скрыта в lp-header-views2.css) */
+.lp-f1 .lp-nav-toggle { display: none; }
+
+/* Мобильное меню: гамбургер + выпадающая навигация (drawer), а не растянутый список */
 @media (max-width: 900px) {
-  .lp-f1 .lp-header__nav { order: 5; width: 100%; padding-top: 8px; border-top: 2px dashed rgba(0,0,0,0.08); }
-  .lp-f1 .lp-header__nav a { padding: 8px 8px; font-size: 12px; }
+  .lp-f1 .lp-header__bar { flex-wrap: wrap; }
+  .lp-f1 .lp-nav-toggle { display: inline-flex; order: 4; margin-left: 4px; }
+  .lp-f1 .lp-login-btn { order: 2; }
+  .lp-f1 .lp-header-cta { order: 3; }
+  .lp-f1 .lp-header__nav {
+    order: 5;
+    flex-basis: 100%;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 2px dashed rgba(0, 0, 0, 0.12);
+  }
+  .lp-f1 .lp-header__nav.lp-header__nav--open { display: flex; }
+  .lp-f1 .lp-header__nav a {
+    padding: 12px 10px;
+    font-size: 13px;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .lp-f1 .lp-header__nav a:last-child { border-bottom: none; }
 }
 @media (max-width: 480px) {
   .lp-f1 .lp-header-cta { font-size: 11px; padding: 8px 10px; }
@@ -177,15 +202,15 @@
 
 .lp-f1 .lp-seo-h1 {
   font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
-  font-size: 32px;
-  line-height: 1.05;
+  font-size: 25px;
+  line-height: 1.08;
   font-weight: 800;
   margin: 0 0 18px 0;
   text-transform: uppercase;
   color: var(--mock-dark);
 }
-@media (min-width: 768px) { .lp-f1 .lp-seo-h1 { font-size: 44px; } }
-@media (min-width: 1024px) { .lp-f1 .lp-seo-h1 { font-size: 56px; } }
+@media (min-width: 768px) { .lp-f1 .lp-seo-h1 { font-size: 34px; } }
+@media (min-width: 1024px) { .lp-f1 .lp-seo-h1 { font-size: 44px; } }
 
 .lp-f1 .lp-snippet-bait {
   background: #fff;
