@@ -228,10 +228,13 @@ def root_asset_href(depth: int, name: str) -> str:
 
 
 def favicon_links_html(depth: int) -> str:
-    ico = root_asset_href(depth, "favicon.ico")
-    svg = root_asset_href(depth, "gemini-svg.svg")
+    # Абсолютные пути от корня домена: одинаковы на всех страницах независимо
+    # от глубины и 301-редиректа на trailing slash (относительные ../../ хрупкие).
+    ico = "/favicon.ico"
+    svg = "/gemini-svg.svg"
     return (
         f'<link rel="icon" href="{attr(ico)}" sizes="32x32" type="image/x-icon">\n'
+        f'<link rel="shortcut icon" href="{attr(ico)}" type="image/x-icon">\n'
         f'<link rel="icon" href="{attr(svg)}" type="image/svg+xml" sizes="any">\n'
     )
 
