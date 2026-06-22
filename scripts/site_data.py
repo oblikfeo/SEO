@@ -93,7 +93,7 @@ LEAVES = {
     ("kb", "education"): ["what-is-vpn", "legality-russia", "how-bypass", "vpn-vs-proxy", "vpn-types"],
     ("tech", "protocols"): ["modern-protocols", "vless-reality", "wireguard-amnezia", "shadowsocks", "hysteria"],
     ("tech", "servers"): ["private-ip", "self-hosted-vpn", "security", "split-tunneling"],
-    ("reviews", "lists"): ["best-vpn-2026", "free-vpn-risks"],
+    ("reviews", "lists"): ["best-vpn-2026", "best-vpn-russia", "free-vpn-risks"],
     ("reviews", "apps"): [
         "happ-vpn",
         "jump-vpn",
@@ -175,6 +175,7 @@ LABELS = {
     "private-ip": "Приватный IP",
     "self-hosted-vpn": "Self-hosted VPN",
     "best-vpn-2026": "Лучшие VPN 2026",
+    "best-vpn-russia": "Лучшие VPN для России 2026",
     "free-vpn-risks": "Риски бесплатных VPN",
     "apk": "APK без вирусов",
     "gaming": "Игры и низкий пинг",
