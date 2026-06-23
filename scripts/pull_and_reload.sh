@@ -13,9 +13,14 @@ if [[ -f "$INSTALL_ROOT/content_overrides.json" ]]; then
   chmod 664 "$INSTALL_ROOT/content_overrides.json"
 fi
 
-# Если стоит мини-админка SEO — перезапустим, чтобы подхватить новый код scripts/admin.py.
-if systemctl list-unit-files | grep -q '^seo-admin.service'; then
-  systemctl restart seo-admin.service || true
+# Если стоит мини-админка SEO — перезапустим, чтобы подхватить site_data.py / admin.py.
+# Без рестарта Flask держит старый список страниц: новые URL есть на сайте, но не в /admin/.
+if systemctl is-active --quiet seo-admin.service 2>/dev/null; then
+  systemctl restart seo-admin.service
+  echo "seo-admin: перезапущен (подхват новых URL для админки)"
+elif systemctl list-unit-files seo-admin.service 2>/dev/null | grep -q '^seo-admin.service'; then
+  systemctl start seo-admin.service
+  echo "seo-admin: запущен"
 fi
 
 nginx -t
