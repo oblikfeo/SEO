@@ -29,11 +29,27 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Надежда",
-  "url": "https://nadezhda.info",
-  "sameAs": [
-    "https://t.me/nadezhda_tehsup"
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://nadezhda.info/#org",
+      "name": "Надежда VPN",
+      "url": "https://nadezhda.info/",
+      "slogan": "Интернет, который просто работает",
+      "sameAs": [
+        "https://t.me/nadezhdavpn_bot"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://nadezhda.info/#website",
+      "url": "https://nadezhda.info/",
+      "name": "Надежда VPN",
+      "inLanguage": "ru",
+      "publisher": {
+        "@id": "https://nadezhda.info/#org"
+      }
+    }
   ]
 }
 </script>

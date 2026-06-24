@@ -600,12 +600,29 @@ def schemas_for(content: dict, cfg: dict) -> list[dict]:
     out: list[dict] = []
     for key in content.get("schemas", []):
         if key == "organization":
+            site = public_site_url(cfg) + "/"
+            org_id = site + "#org"
+            name = f"{cfg['brand']} {cfg['brand_vpn']}"
             out.append({
                 "@context": "https://schema.org",
-                "@type": "Organization",
-                "name": cfg["brand"],
-                "url": public_site_url(cfg),
-                "sameAs": [cfg["telegram_support"]],
+                "@graph": [
+                    {
+                        "@type": "Organization",
+                        "@id": org_id,
+                        "name": name,
+                        "url": site,
+                        "slogan": "Интернет, который просто работает",
+                        "sameAs": ["https://t.me/nadezhdavpn_bot"],
+                    },
+                    {
+                        "@type": "WebSite",
+                        "@id": site + "#website",
+                        "url": site,
+                        "name": name,
+                        "inLanguage": "ru",
+                        "publisher": {"@id": org_id},
+                    },
+                ],
             })
         elif key == "software_app":
             out.append({
