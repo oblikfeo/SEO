@@ -28,7 +28,7 @@ import threading
 from functools import wraps
 from pathlib import Path
 
-from flask import Flask, Response, abort, redirect, request, url_for
+from flask import Flask, Response, abort, redirect, request, send_file, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +60,10 @@ ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin")
 ADMIN_BIND = os.environ.get("ADMIN_BIND", "127.0.0.1")
 ADMIN_PORT = int(os.environ.get("ADMIN_PORT", "5050"))
+# Секретный токен для публичной ссылки скачивания content_overrides.json
+# (страховка от потери данных при сбросе сервера). Задаётся в /etc/seo-admin.env
+# через install_admin.sh. Пустое значение = публичная скачка отключена.
+DOWNLOAD_TOKEN = os.environ.get("DOWNLOAD_TOKEN", "").strip()
 BRAND_TITLE_SUFFIX_DEFAULT = "Надежда VPN"
 
 _write_lock = threading.Lock()
@@ -1987,6 +1991,30 @@ def reset():
 @app.route("/health")
 def health():
     return "ok", 200
+
+
+# ---------- Публичная ссылка для скачивания content_overrides.json ----------
+#
+# Бэкап-страховка: сервер с SEO уже один раз был «обнулён» при переустановке и
+# content_overrides.json (вся работа SEO-специалиста) был утрачен. Эта ручка
+# позволяет в любой момент скачать актуальный файл по секретному 8-символьному
+# токену (без HTTP Basic Auth), сохранив его локально. При неверном или
+# отсутствующем токене отдаём 404, не подтверждая что URL вообще существует.
+#
+# Подключается на верхнем уровне nginx (location ~ ^/dl/[A-Za-z0-9]+$ → 5050),
+# поэтому ссылка вида https://nadezhda.info/dl/<8 символов>.
+@app.route("/dl/<token>")
+def download_overrides(token: str):
+    if not DOWNLOAD_TOKEN or token != DOWNLOAD_TOKEN:
+        abort(404)
+    if not OVERRIDES_PATH.exists():
+        abort(404)
+    return send_file(
+        str(OVERRIDES_PATH),
+        as_attachment=True,
+        download_name="content_overrides.json",
+        mimetype="application/json",
+    )
 
 
 if __name__ == "__main__":

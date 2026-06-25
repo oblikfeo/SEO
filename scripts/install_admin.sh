@@ -29,16 +29,18 @@ fi
 # /etc/seo-admin.env: создаём, если нет, либо обновляем поля из env переменных скрипта.
 if [[ ! -f "$ENV_FILE" ]]; then
   GENERATED_PW="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 20 || true)"
+  GENERATED_DL="$(tr -dc 'a-z0-9' </dev/urandom | head -c 8 || true)"
   cat >"$ENV_FILE" <<EOF
 ADMIN_USER=${ADMIN_USER:-admin}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-$GENERATED_PW}
 ADMIN_BIND=127.0.0.1
 ADMIN_PORT=5050
+DOWNLOAD_TOKEN=${DOWNLOAD_TOKEN:-$GENERATED_DL}
 EOF
   chmod 640 "$ENV_FILE"
   chown root:www-data "$ENV_FILE"
   echo "Создан $ENV_FILE с автогенерированным паролем — см. ниже:"
-  grep -E '^ADMIN_(USER|PASSWORD)=' "$ENV_FILE"
+  grep -E '^(ADMIN_(USER|PASSWORD)|DOWNLOAD_TOKEN)=' "$ENV_FILE"
 else
   # Если переменные заданы при вызове — обновим (без потери остальных строк).
   if [[ -n "${ADMIN_USER:-}" ]]; then
@@ -48,6 +50,20 @@ else
     # экранируем для sed (символы | и \)
     ESC_PW="$(printf '%s' "$ADMIN_PASSWORD" | sed -e 's/[\\|&]/\\&/g')"
     sed -i -E "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=${ESC_PW}|" "$ENV_FILE"
+  fi
+  if [[ -n "${DOWNLOAD_TOKEN:-}" ]]; then
+    ESC_DL="$(printf '%s' "$DOWNLOAD_TOKEN" | sed -e 's/[\\|&]/\\&/g')"
+    if grep -q '^DOWNLOAD_TOKEN=' "$ENV_FILE"; then
+      sed -i -E "s|^DOWNLOAD_TOKEN=.*|DOWNLOAD_TOKEN=${ESC_DL}|" "$ENV_FILE"
+    else
+      echo "DOWNLOAD_TOKEN=${ESC_DL}" >>"$ENV_FILE"
+    fi
+  elif ! grep -q '^DOWNLOAD_TOKEN=' "$ENV_FILE"; then
+    # Старый env без DOWNLOAD_TOKEN — дописываем сгенерированный.
+    GENERATED_DL="$(tr -dc 'a-z0-9' </dev/urandom | head -c 8 || true)"
+    echo "DOWNLOAD_TOKEN=${GENERATED_DL}" >>"$ENV_FILE"
+    echo "Добавлен DOWNLOAD_TOKEN в $ENV_FILE (для публичной ссылки /dl/...):"
+    grep '^DOWNLOAD_TOKEN=' "$ENV_FILE"
   fi
   echo "$ENV_FILE уже существует — переиспользуем (изменения переменных применены, если переданы)."
 fi
