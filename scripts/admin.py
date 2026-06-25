@@ -60,10 +60,6 @@ ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin")
 ADMIN_BIND = os.environ.get("ADMIN_BIND", "127.0.0.1")
 ADMIN_PORT = int(os.environ.get("ADMIN_PORT", "5050"))
-# Секретный токен для публичной ссылки скачивания content_overrides.json
-# (страховка от потери данных при сбросе сервера). Задаётся в /etc/seo-admin.env
-# через install_admin.sh. Пустое значение = публичная скачка отключена.
-DOWNLOAD_TOKEN = os.environ.get("DOWNLOAD_TOKEN", "").strip()
 BRAND_TITLE_SUFFIX_DEFAULT = "Надежда VPN"
 
 _write_lock = threading.Lock()
@@ -1582,6 +1578,7 @@ table.tbl-edit input[type=text].th {{
   <span class="brand">SEO админка<span class="brand-sub">· Надежда VPN</span></span>
   <nav>
     <a href="{url_for('index')}">Страницы</a>
+    <a href="{url_for('download_overrides')}" download title="Скачать актуальный content_overrides.json (бэкап на свой ПК)">Скачать бэкап ↓</a>
     <a href="https://nadezhda.info/" target="_blank" rel="noopener">Открыть сайт ↗</a>
     <button type="button" class="view-toggle" onclick="toggleAltView()">Альтернативный вид</button>
   </nav>
@@ -1993,20 +1990,15 @@ def health():
     return "ok", 200
 
 
-# ---------- Публичная ссылка для скачивания content_overrides.json ----------
+# ---------- Скачивание content_overrides.json (только из админки) ----------
 #
-# Бэкап-страховка: сервер с SEO уже один раз был «обнулён» при переустановке и
-# content_overrides.json (вся работа SEO-специалиста) был утрачен. Эта ручка
-# позволяет в любой момент скачать актуальный файл по секретному 8-символьному
-# токену (без HTTP Basic Auth), сохранив его локально. При неверном или
-# отсутствующем токене отдаём 404, не подтверждая что URL вообще существует.
-#
-# Подключается на верхнем уровне nginx (location ~ ^/dl/[A-Za-z0-9]+$ → 5050),
-# поэтому ссылка вида https://nadezhda.info/dl/<8 символов>.
-@app.route("/dl/<token>")
-def download_overrides(token: str):
-    if not DOWNLOAD_TOKEN or token != DOWNLOAD_TOKEN:
-        abort(404)
+# Бэкап-страховка: сервер с SEO уже один раз был «обнулён» при переустановке
+# и весь content_overrides.json (вся работа SEO-специалиста) был утрачен.
+# Кнопка «Скачать бэкап» в шапке админки даёт сохранить актуальный файл
+# локально в любой момент. Доступ — только за HTTP Basic Auth админки.
+@app.route("/download")
+@require_auth
+def download_overrides():
     if not OVERRIDES_PATH.exists():
         abort(404)
     return send_file(
