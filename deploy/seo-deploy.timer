@@ -1,0 +1,9 @@
+[Unit]
+Description=nadezhda.info: проверка git раз в минуту
+
+[Timer]
+OnCalendar=*:*:00
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

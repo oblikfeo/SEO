@@ -1,0 +1,17 @@
+{
+  "title": "Сетевое оборудование — Надежда VPN",
+  "description": "Роутеры Keenetic, ASUS.",
+  "h1": "Сетевое оборудование",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Роутеры Keenetic, ASUS."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

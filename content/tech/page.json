@@ -1,0 +1,17 @@
+{
+  "title": "Технологии VPN — Надежда VPN",
+  "description": "Протоколы VLESS, Reality, серверы.",
+  "h1": "Технологии VPN",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Протоколы VLESS, Reality, серверы."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

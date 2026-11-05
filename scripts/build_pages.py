@@ -2,7 +2,8 @@
 """Сборка статического SEO-лендинга в seo-landing/public/.
 
 Запуск:  python scripts/build_pages.py
-Без npm/vite. Все тексты — из site_data.py (перенесены из SEO-work дословно).
+Без npm/vite. Контент каждой страницы — content/<путь>/page.json, дерево URL — scripts/site_data.py.
+Каталог сборки можно задать через SEO_PUBLIC_DIR (автосборка на сервере собирает в новую папку).
 
 Реализует ТЗ:
 - §1 silo URL
@@ -25,8 +26,6 @@ from urllib.parse import urlencode
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
 from site_data import (  # noqa: E402
-    CONTENT,
-    HOME,
     HUBS,
     LABELS,
     LEAVES,
@@ -36,12 +35,10 @@ from site_data import (  # noqa: E402
 )
 
 CFG_PATH = ROOT / "site_config.json"
-# КРИТИЧНО: overrides с продакшена (админка SEO). В git — только {}.
-# Деплой: scripts/safe_git_update.sh (бэкап → git reset → restore). См. AGENTS-SEO.md
-OVERRIDES_PATH = ROOT / "content_overrides.json"
+CONTENT_DIR = ROOT / "content"
 ASSETS_SRC = ROOT / "assets" / "css"
 ASSETS_ROOT = ROOT / "assets"
-PUBLIC = ROOT / "public"
+PUBLIC = Path(os.environ.get("SEO_PUBLIC_DIR") or ROOT / "public")
 PUBLIC_ASSETS = PUBLIC / "assets" / "css"
 
 FAVICON_FILES = ["favicon.ico", "gemini-svg.svg"]
@@ -75,42 +72,49 @@ def load_config() -> dict:
     return json.loads(CFG_PATH.read_text(encoding="utf-8"))
 
 
-_OVERRIDES_CACHE: dict | None = None
+class ContentError(Exception):
+    """Ошибка в файле контента: сборка останавливается, живой сайт не меняется."""
 
 
-def load_overrides() -> dict:
-    """Подмены SEO-полей (title/description/h1) по путям. Файл правит мини-админка."""
-    global _OVERRIDES_CACHE
-    if _OVERRIDES_CACHE is not None:
-        return _OVERRIDES_CACHE
-    if OVERRIDES_PATH.exists():
-        try:
-            _OVERRIDES_CACHE = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8")) or {}
-        except json.JSONDecodeError:
-            _OVERRIDES_CACHE = {}
-    else:
-        _OVERRIDES_CACHE = {}
-    return _OVERRIDES_CACHE
+def content_path(path: str) -> Path:
+    return CONTENT_DIR / path.strip("/") / "page.json" if path != "/" else CONTENT_DIR / "page.json"
 
 
-def override_for(path: str) -> dict:
-    o = load_overrides().get(path, {})
-    return o if isinstance(o, dict) else {}
+def load_page(path: str) -> dict:
+    """Читает и проверяет content/<путь>/page.json."""
+    file = content_path(path)
+    rel = file.relative_to(ROOT).as_posix()
+    if not file.exists():
+        raise ContentError(f"{path}: нет файла {rel}")
+    try:
+        data = json.loads(file.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise ContentError(f"{rel}: битый JSON, строка {e.lineno}: {e.msg}") from e
+    for key in ("title", "description", "h1"):
+        if not isinstance(data.get(key), str) or not data[key].strip():
+            raise ContentError(f"{rel}: пустое поле {key}")
+    if not isinstance(data.get("sections"), list):
+        raise ContentError(f"{rel}: нет списка sections")
+    return data
 
 
-def pick(override: str | None, default: str) -> str:
-    s = (override or "").strip()
-    return s if s else default
+def check_no_orphans(pages: list[dict]) -> None:
+    """Файл контента без страницы в дереве не попадёт на сайт — лучше сразу остановиться."""
+    known = {content_path(p["path"]).resolve() for p in pages}
+    for file in sorted(CONTENT_DIR.rglob("page.json")):
+        if file.resolve() not in known:
+            rel = file.relative_to(ROOT).as_posix()
+            raise ContentError(f"{rel}: страницы нет в дереве URL, добавьте её в scripts/site_data.py")
 
 
-# ---------- Нормализация sections-override ----------
+# ---------- Секции страницы: JSON → кортежи для render_sections ----------
 
 def _coerce(v) -> str:
     return v.strip() if isinstance(v, str) else ""
 
 
 def _normalize_section_dict(item) -> tuple | None:
-    """Конвертирует JSON-словарь из overrides в кортеж, который понимает render_sections."""
+    """Конвертирует секцию из page.json в кортеж, который понимает render_sections."""
     if not isinstance(item, dict):
         return None
     t = _coerce(item.get("type")).lower()
@@ -165,7 +169,10 @@ def _normalize_section_dict(item) -> tuple | None:
             tag = _coerce(c.get("tag"))
             if title and href:
                 cards.append((title, desc, href, tag))
-        return ("cards", cards) if cards else None
+        modifier = "lp-card-grid--3" if item.get("columns") == 3 else ""
+        return ("cards", cards, modifier) if cards else None
+    if t == "child_cards":
+        return ("child_cards",)
     if t == "related":
         title = _coerce(item.get("title"))
         items = []
@@ -179,19 +186,19 @@ def _normalize_section_dict(item) -> tuple | None:
         if not title or not items:
             return None
         return ("related", title, items)
-    return None
+    raise ContentError(f"неизвестный тип секции: {t or item}")
 
 
-def sections_override(path: str) -> list | None:
-    raw = override_for(path).get("sections")
-    if not raw or not isinstance(raw, list):
-        return None
+def page_sections(path: str, data: dict) -> list:
     out: list = []
-    for raw_section in raw:
-        tup = _normalize_section_dict(raw_section)
+    for raw_section in data["sections"]:
+        try:
+            tup = _normalize_section_dict(raw_section)
+        except ContentError as e:
+            raise ContentError(f"{path}: {e}") from e
         if tup:
             out.append(tup)
-    return out or None
+    return out
 
 
 def attr(text: str) -> str:
@@ -514,7 +521,7 @@ def render_related(title: str, items: list[tuple[str, str]], depth: int) -> str:
 
 
 def standard_related_html(page: dict, depth: int) -> str:
-    """Единый блок навигации для hub / leaf / sub (контент из CONTENT или stub)."""
+    """Единый блок навигации для hub / leaf / sub."""
     kind = page.get("kind")
     silo = page.get("silo")
     hub = page.get("hub")
@@ -559,12 +566,27 @@ def standard_related_html(page: dict, depth: int) -> str:
     return "".join(blocks)
 
 
+def child_cards(page: dict) -> list[tuple[str, str, str, str]]:
+    """Карточки дочерних страниц: строятся из дерева URL, новая страница появляется в них сама."""
+    if page["kind"] == "silo":
+        return [
+            (hub_title, hub_desc, f"/{page['silo']}/{hub_slug}/", "")
+            for hub_slug, hub_title, hub_desc in HUBS.get(page["silo"], [])
+        ]
+    if page["kind"] == "hub":
+        return [
+            (LABELS.get(leaf, leaf.replace("-", " ").title()), "Открыть страницу.", f"/{page['silo']}/{page['hub']}/{leaf}/", "")
+            for leaf in LEAVES.get((page["silo"], page["hub"]), [])
+        ]
+    return []
+
+
 def render_sections(
     sections: list[tuple],
     cfg: dict,
     depth: int,
     slug: str,
-    card_grid_modifier: str = "",
+    page: dict,
 ) -> tuple[str, list[dict]]:
     out: list[str] = []
     extras: list[dict] = []
@@ -575,7 +597,11 @@ def render_sections(
         elif kind == "snippet":
             out.append(f'<p class="lp-snippet-bait">{sec[1]}</p>')
         elif kind == "cards":
-            out.append(render_card_grid(sec[1], depth, card_grid_modifier))
+            out.append(render_card_grid(sec[1], depth, sec[2]))
+        elif kind == "child_cards":
+            cards = child_cards(page)
+            if cards:
+                out.append(render_card_grid(cards, depth, "lp-card-grid--3"))
         elif kind == "table":
             out.append(render_table(sec[1], sec[2]))
         elif kind == "howto":
@@ -636,141 +662,19 @@ def schemas_for(content: dict, cfg: dict) -> list[dict]:
     return out
 
 
-def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict], str | None]:
-    """Возвращает (title, description, main_html, extras_ld, kicker_text)."""
+def render_main_block(page: dict, cfg: dict) -> tuple[str, str, str, list[dict]]:
+    """Возвращает (title, description, main_html, extras_ld)."""
     path = page["path"]
     depth = depth_for(path)
     slug = path.strip("/").replace("/", "-") or "home"
+    data = load_page(path)
 
-    if path == "/":
-        content = HOME
-        kicker = None
-    elif path in CONTENT:
-        content = CONTENT[path]
-        # Без служебных меток вроде «Хаб», «Раздел» — только заголовок и контент
-        kicker = None
-    else:
-        return render_stub(page, cfg, depth, slug)
-
-    ov = override_for(path)
-    title = pick(ov.get("title"), content["title"])
-    description = pick(ov.get("description"), content["description"])
-    h1_text = pick(ov.get("h1"), content["h1"])
-    # Если задан h1-override — используем простой текст и игнорируем h1_html (с акцентами).
-    h1_html = None if (ov.get("h1") or "").strip() else content.get("h1_html")
-
-    # Если есть override sections — заменяем список секций целиком.
-    sec_ov = sections_override(path)
-    if sec_ov is not None:
-        content = dict(content)
-        content["sections"] = sec_ov
-
-    parts: list[str] = []
-    if kicker:
-        parts.append(f'<span class="lp-seo-kicker">{attr(kicker)}</span>')
-    if h1_html:
-        parts.append(f'<h1 class="lp-seo-h1">{h1_html}</h1>')
-    else:
-        parts.append(f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>')
-
-    card_modifier = "lp-card-grid--3" if page.get("kind") in ("home", "silo", "hub") else ""
-    body, extras = render_sections(content["sections"], cfg, depth, slug, card_modifier)
+    h1_html = data.get("h1_html")
+    h1 = f'<h1 class="lp-seo-h1">{h1_html or attr(data["h1"])}</h1>'
+    body, extras = render_sections(page_sections(path, data), cfg, depth, slug, page)
     body += standard_related_html(page, depth)
-    parts.append(body)
 
-    extras_ld = list(extras) + schemas_for(content, cfg)
-    return title, description, "".join(parts), extras_ld, kicker
-
-
-def render_stub(
-    page: dict, cfg: dict, depth: int, slug: str
-) -> tuple[str, str, str, list[dict], str | None]:
-    kind = page["kind"]
-    ov = override_for(page["path"])
-    sec_ov = sections_override(page["path"])
-    brand_suffix = f"{cfg['brand']} {cfg['brand_vpn']}"
-
-    if kind == "silo":
-        title_h, desc = SILO_META[page["silo"]]
-        kicker = None
-        cards = [
-            (hub_title, hub_desc, f"/{page['silo']}/{hub_slug}/", "")
-            for hub_slug, hub_title, hub_desc in HUBS.get(page["silo"], [])
-        ]
-        h1_text = pick(ov.get("h1"), title_h)
-        snippet = pick(ov.get("description"), desc)
-        page_title = pick(ov.get("title"), f"{title_h} — {brand_suffix}")
-        cards_html = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
-        if sec_ov:
-            body, extras = render_sections(sec_ov, cfg, depth, slug, "")
-            main = (
-                f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
-                + cards_html
-                + body
-                + standard_related_html(page, depth)
-            )
-            return page_title, snippet, main, list(extras), kicker
-        main = (
-            f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
-            f'<p class="lp-snippet-bait">{attr(snippet)}</p>'
-            + cards_html
-            + render_trial(cfg, slug)
-        )
-        return page_title, snippet, main, [], kicker
-
-    if kind == "hub":
-        title_h, desc = page["title"], page["description"]
-        kicker = None
-        cards = [
-            (LABELS.get(leaf, leaf.replace("-", " ").title()), "Открыть страницу.", f"/{page['silo']}/{page['hub']}/{leaf}/", "")
-            for leaf in LEAVES.get((page["silo"], page["hub"]), [])
-        ]
-        h1_text = pick(ov.get("h1"), title_h)
-        snippet = pick(ov.get("description"), desc)
-        page_title = pick(ov.get("title"), f"{title_h} — {brand_suffix}")
-        cards_html = render_card_grid(cards, depth, "lp-card-grid--3") if cards else ""
-        if sec_ov:
-            body, extras = render_sections(sec_ov, cfg, depth, slug, "")
-            main = (
-                f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
-                + cards_html
-                + body
-                + standard_related_html(page, depth)
-            )
-            return page_title, snippet, main, list(extras), kicker
-        main = (
-            f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
-            f'<p class="lp-snippet-bait">{attr(snippet)}</p>'
-            + cards_html
-            + render_trial(cfg, slug)
-            + standard_related_html(page, depth)
-        )
-        return page_title, snippet, main, [], kicker
-
-    # leaf / sub stubs
-    leaf = page.get("sub") or page.get("leaf", "page")
-    name = LABELS.get(leaf, leaf.replace("-", " ").title())
-    kicker = None
-    h1_text = pick(ov.get("h1"), f"VPN: {name}")
-    page_title = pick(ov.get("title"), f"VPN {name} — {brand_suffix}")
-    page_desc = pick(
-        ov.get("description"),
-        f"VPN-решение для запроса «{name}». 8 часов бесплатного теста в Личном Кабинете.",
-    )
-    if sec_ov:
-        body, extras = render_sections(sec_ov, cfg, depth, slug, "")
-        main = (
-            f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
-            + body
-            + standard_related_html(page, depth)
-        )
-        return page_title, page_desc, main, list(extras), kicker
-    main = (
-        f'<h1 class="lp-seo-h1">{attr(h1_text)}</h1>'
-        + render_trial(cfg, slug)
-        + standard_related_html(page, depth)
-    )
-    return page_title, page_desc, main, [], kicker
+    return data["title"], data["description"], h1 + body, list(extras) + schemas_for(data, cfg)
 
 
 # ---------- Page shell ----------
@@ -896,31 +800,8 @@ def write_sitemap(cfg: dict, pages: list[dict]) -> None:
     (PUBLIC / "sitemap.xml").write_text(xml, encoding="utf-8")
 
 
-def chown_public_to_www_data() -> None:
-    """После сборки от root — вернуть public/ www-data, иначе админка не сможет пересобрать."""
-    if os.name != "posix" or os.geteuid() != 0 or not PUBLIC.exists():
-        return
-    try:
-        import pwd
-
-        pw = pwd.getpwnam("www-data")
-        uid, gid = pw.pw_uid, pw.pw_gid
-    except (ImportError, KeyError):
-        return
-    for root, dirs, files in os.walk(PUBLIC):
-        os.chown(root, uid, gid)
-        for name in files:
-            os.chown(os.path.join(root, name), uid, gid)
-        for name in dirs:
-            os.chown(os.path.join(root, name), uid, gid)
-
-
 def reset_public_dir() -> None:
-    """Очистить public/, не удаляя сам каталог.
-
-    Админка (www-data) не может rmdir public под root-owned /var/www/seo — только
-    содержимое. Полный shutil.rmtree(PUBLIC) даёт PermissionError на сервере.
-    """
+    """Очистить каталог сборки, не удаляя его самого."""
     PUBLIC.mkdir(parents=True, exist_ok=True)
     for child in PUBLIC.iterdir():
         if child.is_dir():
@@ -931,6 +812,8 @@ def reset_public_dir() -> None:
 
 def main() -> None:
     cfg = load_config()
+    pages = build_pages_list()
+    check_no_orphans(pages)
 
     reset_public_dir()
     PUBLIC_ASSETS.mkdir(parents=True)
@@ -942,8 +825,10 @@ def main() -> None:
         src = ASSETS_ROOT / f
         if src.exists():
             shutil.copy2(src, PUBLIC / f)
+    images = ASSETS_ROOT / "img"
+    if images.exists():
+        shutil.copytree(images, PUBLIC / "assets" / "img")
 
-    pages = build_pages_list()
     write_robots(cfg)
     write_sitemap(cfg, pages)
 
@@ -951,7 +836,7 @@ def main() -> None:
         path = page["path"]
         depth = depth_for(path)
         slug = path.strip("/").replace("/", "-") or "home"
-        title, desc, main_html, extras_ld, _ = render_main_block(page, cfg)
+        title, desc, main_html, extras_ld = render_main_block(page, cfg)
         active_silo = f"/{page['silo']}/" if page.get("silo") else None
         crumbs = breadcrumbs_for(page)
         html_text = page_shell(
@@ -970,9 +855,12 @@ def main() -> None:
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "index.html").write_text(html_text, encoding="utf-8")
 
-    chown_public_to_www_data()
     print(f"Built {len(pages)} pages -> {PUBLIC}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except ContentError as e:
+        print(f"ОШИБКА КОНТЕНТА: {e}", file=sys.stderr)
+        sys.exit(1)

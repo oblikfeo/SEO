@@ -1,0 +1,17 @@
+{
+  "title": "Видеостриминг — Надежда VPN",
+  "description": "YouTube, Netflix.",
+  "h1": "Видеостриминг",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "YouTube, Netflix."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Браузеры — Надежда VPN",
+  "description": "Chrome, Яндекс, Opera.",
+  "h1": "Браузеры",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Chrome, Яндекс, Opera."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

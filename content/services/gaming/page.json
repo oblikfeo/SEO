@@ -1,0 +1,17 @@
+{
+  "title": "VPN для игр — Надежда VPN",
+  "description": "Roblox, Discord, Steam.",
+  "h1": "VPN для игр",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Roblox, Discord, Steam."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

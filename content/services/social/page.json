@@ -1,0 +1,17 @@
+{
+  "title": "Социальные сети — Надежда VPN",
+  "description": "Instagram, TikTok.",
+  "h1": "Социальные сети",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Instagram, TikTok."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

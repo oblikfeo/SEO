@@ -1,0 +1,17 @@
+{
+  "title": "Smart TV — Надежда VPN",
+  "description": "Android TV, Apple TV.",
+  "h1": "Smart TV",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Android TV, Apple TV."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

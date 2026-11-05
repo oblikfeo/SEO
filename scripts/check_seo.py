@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """Быстрая проверка SEO-метаданных на каждой странице public/."""
+import os
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC = ROOT / "public"
+PUBLIC = Path(os.environ.get("SEO_PUBLIC_DIR") or ROOT / "public")
 
 
 def main() -> int:

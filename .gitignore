@@ -8,3 +8,4 @@ __pycache__/
 
 # локальный помощник деплоя (без секретов)
 scripts/_remote_deploy_runner.py
+public/

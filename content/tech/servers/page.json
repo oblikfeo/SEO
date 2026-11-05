@@ -1,0 +1,17 @@
+{
+  "title": "Серверы — Надежда VPN",
+  "description": "Приватный IP, self-hosted.",
+  "h1": "Серверы",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Приватный IP, self-hosted."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

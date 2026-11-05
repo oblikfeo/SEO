@@ -1,0 +1,18 @@
+[Unit]
+Description=nadezhda.info: автосборка из git
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=seo-build
+Group=seo-build
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=HOME=/var/lib/seo-deploy
+UMask=0022
+ExecStart=/usr/local/bin/seo-deploy
+TimeoutStartSec=300
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/var/www/seo /var/www/seo-releases /var/lib/seo-deploy

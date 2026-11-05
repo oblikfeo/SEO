@@ -1,0 +1,17 @@
+{
+  "title": "Рейтинги VPN — Надежда VPN",
+  "description": "Сравнения и обзоры 2026.",
+  "h1": "Рейтинги VPN",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Сравнения и обзоры 2026."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

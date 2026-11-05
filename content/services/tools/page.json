@@ -1,0 +1,17 @@
+{
+  "title": "Коммуникации и сервисы — Надежда VPN",
+  "description": "Telegram, ChatGPT.",
+  "h1": "Коммуникации и сервисы",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Telegram, ChatGPT."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

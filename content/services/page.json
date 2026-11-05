@@ -1,0 +1,17 @@
+{
+  "title": "VPN для сервисов — Надежда VPN",
+  "description": "YouTube, Telegram, игры и социальные сети.",
+  "h1": "VPN для сервисов",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "YouTube, Telegram, игры и социальные сети."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

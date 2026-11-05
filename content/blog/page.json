@@ -1,0 +1,17 @@
+{
+  "title": "Блог — Надежда VPN",
+  "description": "Статьи о VPN и доступе.",
+  "h1": "Блог",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Статьи о VPN и доступе."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

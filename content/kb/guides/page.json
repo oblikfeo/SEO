@@ -1,0 +1,17 @@
+{
+  "title": "Инструкции — Надежда VPN",
+  "description": "Настройка и раздача VPN.",
+  "h1": "Инструкции",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "Настройка и раздача VPN."
+    },
+    {
+      "type": "child_cards"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}

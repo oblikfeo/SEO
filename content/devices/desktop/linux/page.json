@@ -1,0 +1,44 @@
+{
+  "title": "тест",
+  "description": "тест",
+  "h1": "тест",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "тест"
+    },
+    {
+      "type": "prose",
+      "html": "тест тест тест"
+    },
+    {
+      "type": "howto",
+      "items": [
+        {
+          "key": "registration",
+          "label": ""
+        },
+        {
+          "key": "apk",
+          "label": ""
+        },
+        {
+          "key": "import",
+          "label": ""
+        }
+      ]
+    },
+    {
+      "type": "trial"
+    },
+    {
+      "type": "faq",
+      "items": [
+        {
+          "q": "тест",
+          "a": "тест"
+        }
+      ]
+    }
+  ]
+}
