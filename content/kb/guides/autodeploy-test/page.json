@@ -1,0 +1,14 @@
+{
+  "title": "Тест автосборки",
+  "description": "Временная страница для проверки автосборки.",
+  "h1": "Тест автосборки",
+  "sections": [
+    {
+      "type": "snippet",
+      "text": "AUTODEPLOY-NEW-PAGE-OK"
+    },
+    {
+      "type": "trial"
+    }
+  ]
+}
