@@ -76,7 +76,7 @@ LEAVES = {
     ("services", "tools"): ["telegram", "chatgpt-openai", "messengers", "video-calls"],
     ("kb", "fixes"): ["vpn-not-working", "slow-speed", "android", "iphone", "windows", "happ"],
     ("kb", "guides"): ["how-to-setup", "how-to-share", "vpn-keys", "install-happ", "enable-disable", "no-registration"],
-    ("kb", "education"): ["what-is-vpn", "legality-russia", "how-bypass", "vpn-vs-proxy", "vpn-types"],
+    ("kb", "education"): ["what-is-vpn", "legality-russia", "how-bypass", "vpn-vs-proxy", "vpn-types", "whitelist"],
     ("tech", "protocols"): ["modern-protocols", "vless-reality", "wireguard-amnezia", "shadowsocks", "hysteria"],
     ("tech", "servers"): ["private-ip", "self-hosted-vpn", "security", "split-tunneling"],
     ("reviews", "lists"): [
@@ -194,6 +194,7 @@ LABELS = {
     "how-bypass": "Как VPN обходит блокировки",
     "vpn-vs-proxy": "VPN vs прокси",
     "vpn-types": "Типы и виды VPN",
+    "whitelist": "Белые списки интернета",
     "vless-reality": "VLESS и Reality",
     "wireguard-amnezia": "AmneziaWG / WireGuard",
     "shadowsocks": "Shadowsocks",
