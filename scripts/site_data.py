@@ -46,7 +46,6 @@ HUBS = {
     "blog": [
         ("russian-vpn", "Русский VPN — что это значит", "Разбираемся в термине и отличиях."),
         ("amnezia-setup", "Амнезия VPN: настройка с нуля", "Пошаговая настройка AmneziaVPN."),
-        ("tspu-whitelist", "Белый список ТСПУ: что это", "Как работает фильтрация и белые списки."),
         ("vpn-config", "Конфигурация VPN: что такое конфиг", "Что такое конфиг и как его использовать."),
         ("happ-udalen-iz-app-store", "Happ удалён из App Store: что делать", "Почему Happ пропал из App Store и как установить клиент на iPhone в 2026."),
     ],
@@ -214,7 +213,6 @@ LABELS = {
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
-    "tspu-whitelist": "Белый список ТСПУ",
     "vpn-config": "Конфигурация VPN",
     "happ-udalen-iz-app-store": "Happ удалён из App Store",
 }
