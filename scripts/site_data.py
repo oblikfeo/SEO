@@ -93,6 +93,7 @@ LEAVES = {
         "outline-vpn",
         "v2raytun",
         "browsec",
+        "sota-vpn",
     ],
 }
 
@@ -210,6 +211,7 @@ LABELS = {
     "outline-vpn": "Outline VPN",
     "v2raytun": "v2RayTun",
     "browsec": "Browsec",
+    "sota-vpn": "Sota VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
