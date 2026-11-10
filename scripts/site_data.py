@@ -94,6 +94,7 @@ LEAVES = {
         "v2raytun",
         "browsec",
         "sota-vpn",
+        "byedpi",
     ],
 }
 
@@ -212,6 +213,7 @@ LABELS = {
     "v2raytun": "v2RayTun",
     "browsec": "Browsec",
     "sota-vpn": "Sota VPN",
+    "byedpi": "ByeDPI",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
