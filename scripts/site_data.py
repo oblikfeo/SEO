@@ -95,6 +95,7 @@ LEAVES = {
         "browsec",
         "sota-vpn",
         "byedpi",
+        "super-vpn",
     ],
 }
 
@@ -214,6 +215,7 @@ LABELS = {
     "browsec": "Browsec",
     "sota-vpn": "Sota VPN",
     "byedpi": "ByeDPI",
+    "super-vpn": "Super VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
