@@ -638,3 +638,24 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+
+/* ---------- Скриншоты в тексте ---------- */
+.lp-f1 .lp-figure {
+  margin: 20px 0 24px;
+}
+.lp-f1 .lp-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 2px solid var(--mock-dark);
+  box-shadow: 4px 4px 0 var(--mock-primary);
+}
+.lp-f1 .lp-figure--narrow img {
+  max-width: 420px;
+}
+.lp-f1 .lp-figure figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.75;
+}
