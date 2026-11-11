@@ -138,7 +138,7 @@ def _normalize_section_dict(item) -> tuple | None:
                 items.append((key, label))
         return ("howto", items) if items else None
     if t == "trial":
-        return ("trial",)
+        return ("trial", _coerce(item.get("variant")))
     if t == "faq":
         pairs = []
         for it in item.get("items") or []:
@@ -488,7 +488,22 @@ def render_howto(cfg: dict, slug: str, items: list[tuple[str, str]]) -> tuple[st
     return block, ld
 
 
-def render_trial(cfg: dict, slug: str) -> str:
+def render_trial(cfg: dict, slug: str, variant: str = "") -> str:
+    if variant == "noreg":
+        q = urlencode({"utm_source": cfg["utm_source"], "utm_medium": cfg["utm_medium"], "utm_campaign": slug})
+        buy = cfg["base_url"].rstrip("/") + cfg.get("buy_path", "/buy") + "?" + q
+        bot = cfg.get("telegram_bot", "https://t.me/nadezhdavpn_bot")
+        return (
+            '<aside class="lp-trial-block">'
+            "<h2>Проверьте решение прямо сейчас</h2>"
+            "<p>8 часов полного доступа бесплатно: тест сразу выдаёт Telegram-бот, без почты и телефона. "
+            "Купить подписку тоже можно без отдельной регистрации — в боте или на сайте в 3 клика.</p>"
+            '<div class="lp-trial-block__actions">'
+            f'<a class="lp-btn-primary" href="{attr(bot)}" data-page="{attr(slug)}-trial-bot">Тест в Telegram-боте</a>'
+            f'<a class="lp-btn-primary" href="{attr(buy)}" data-page="{attr(slug)}-trial-buy">Купить в 3 клика</a>'
+            "</div>"
+            "</aside>"
+        )
     reg = register_url(cfg, slug)
     return (
         '<aside class="lp-trial-block">'
@@ -612,7 +627,7 @@ def render_sections(
             out.append(block)
             extras.append(ld)
         elif kind == "trial":
-            out.append(render_trial(cfg, slug))
+            out.append(render_trial(cfg, slug, sec[1] if len(sec) > 1 else ""))
         elif kind == "faq":
             block, ld = render_faq(sec[1])
             out.append(block)

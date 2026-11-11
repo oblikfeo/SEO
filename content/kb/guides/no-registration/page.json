@@ -29,7 +29,8 @@
       ]
     },
     {
-      "type": "trial"
+      "type": "trial",
+      "variant": "noreg"
     },
     {
       "type": "prose",

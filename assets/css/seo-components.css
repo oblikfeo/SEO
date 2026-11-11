@@ -632,3 +632,9 @@
   color: #4b5563;
   max-width: 820px;
 }
+
+.lp-f1 .lp-trial-block__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
