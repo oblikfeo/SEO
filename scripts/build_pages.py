@@ -18,7 +18,9 @@ import html
 import json
 import os
 import re
+import datetime
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import urlencode
@@ -785,12 +787,36 @@ def write_robots(cfg: dict) -> None:
     )
 
 
+def content_lastmod() -> dict[str, str]:
+    """Дата последнего изменения каждого content/**/page.json: из git (один вызов), иначе — mtime файла."""
+    dates: dict[str, str] = {}
+    try:
+        out = subprocess.run(
+            ["git", "log", "--format=@%cs", "--name-only", "--", "content"],
+            cwd=ROOT, capture_output=True, text=True, timeout=60, check=True,
+        ).stdout
+        cur = ""
+        for line in out.splitlines():
+            if line.startswith("@"):
+                cur = line[1:]
+            elif line.endswith("page.json") and line not in dates:
+                dates[line] = cur
+    except Exception:
+        pass
+    return dates
+
+
 def write_sitemap(cfg: dict, pages: list[dict]) -> None:
     base = public_site_url(cfg)
+    dates = content_lastmod()
     urls = []
     for page in pages:
         loc = base + page["path"]
-        urls.append(f"  <url><loc>{loc}</loc></url>")
+        rel = "content/" + (page["path"].strip("/") + "/" if page["path"].strip("/") else "") + "page.json"
+        mod = dates.get(rel)
+        if not mod and (ROOT / rel).exists():
+            mod = datetime.date.fromtimestamp((ROOT / rel).stat().st_mtime).isoformat()
+        urls.append(f"  <url><loc>{loc}</loc>" + (f"<lastmod>{mod}</lastmod>" if mod else "") + "</url>")
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
