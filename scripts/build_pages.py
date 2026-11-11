@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from site_data import (  # noqa: E402
     HUBS,
     LABELS,
+    LEAF_DESC,
     LEAVES,
     SILO_META,
     SUBLEAVES,
@@ -577,7 +578,7 @@ def child_cards(page: dict) -> list[tuple[str, str, str, str]]:
         ]
     if page["kind"] == "hub":
         return [
-            (LABELS.get(leaf, leaf.replace("-", " ").title()), "Открыть страницу.", f"/{page['silo']}/{page['hub']}/{leaf}/", "")
+            (LABELS.get(leaf, leaf.replace("-", " ").title()), LEAF_DESC.get(leaf) or "Открыть страницу.", f"/{page['silo']}/{page['hub']}/{leaf}/", "")
             for leaf in LEAVES.get((page["silo"], page["hub"]), [])
         ]
     return []
