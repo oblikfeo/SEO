@@ -98,6 +98,7 @@ LEAVES = {
         "super-vpn",
         "hiro-vpn",
         "lagom-vpn",
+        "pipl-vpn",
     ],
 }
 
@@ -156,6 +157,7 @@ LEAF_DESC = {
     "super-vpn": "Несколько приложений под одним именем и утечка 2023 года.",
     "hiro-vpn": "Hiro VPN: где скачать официально, что даёт бесплатно и работает ли в России.",
     "lagom-vpn": "Lagom VPN: цена, бесплатный тариф и работает ли в России.",
+    "pipl-vpn": "Pipl VPN: тарифы, пробный период и работает ли в России.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -280,6 +282,7 @@ LABELS = {
     "super-vpn": "Super VPN",
     "hiro-vpn": "Hiro VPN",
     "lagom-vpn": "Lagom VPN",
+    "pipl-vpn": "Pipl VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
