@@ -101,6 +101,20 @@ def load_page(path: str) -> dict:
     return data
 
 
+# Пути страниц с "noindex": true в page.json: robots noindex, вне sitemap, карточек и перелинковки.
+NOINDEX: set[str] = set()
+
+
+def collect_noindex(pages: list[dict]) -> None:
+    for p in pages:
+        f = content_path(p["path"])
+        try:
+            if f.exists() and json.loads(f.read_text(encoding="utf-8")).get("noindex") is True:
+                NOINDEX.add(p["path"] if p["path"].endswith("/") else p["path"] + "/")
+        except Exception:
+            pass
+
+
 def check_no_orphans(pages: list[dict]) -> None:
     """Файл контента без страницы в дереве не попадёт на сайт — лучше сразу остановиться."""
     known = {content_path(p["path"]).resolve() for p in pages}
@@ -559,7 +573,7 @@ def standard_related_html(page: dict, depth: int) -> str:
         if not leaf:
             return "".join(blocks)
         leaves_list = LEAVES.get((silo, hub), [])
-        leaf_links = [(LABELS[l], f"/{silo}/{hub}/{l}/") for l in leaves_list if l != leaf]
+        leaf_links = [(LABELS[l], f"/{silo}/{hub}/{l}/") for l in leaves_list if l != leaf and f"/{silo}/{hub}/{l}/" not in NOINDEX]
         if leaf_links:
             blocks.append(render_related("Другие страницы в этом разделе", leaf_links, depth))
         subs = SUBLEAVES.get((silo, hub, leaf), [])
@@ -595,6 +609,7 @@ def child_cards(page: dict) -> list[tuple[str, str, str, str]]:
         return [
             (LABELS.get(leaf, leaf.replace("-", " ").title()), LEAF_DESC.get(leaf) or "Открыть страницу.", f"/{page['silo']}/{page['hub']}/{leaf}/", "")
             for leaf in LEAVES.get((page["silo"], page["hub"]), [])
+            if f"/{page['silo']}/{page['hub']}/{leaf}/" not in NOINDEX
         ]
     return []
 
@@ -744,6 +759,7 @@ def page_shell(
     crumbs: list[tuple[str, str | None]],
     main_html: str,
     extras_ld: list[dict],
+    noindex: bool = False,
 ) -> str:
     canon = public_site_url(cfg) + canonical_path
     css_links = "\n".join(f'  <link rel="stylesheet" href="{attr(asset_href(depth, f))}">' for f in CSS_FILES)
@@ -760,7 +776,7 @@ def page_shell(
         f"<title>{attr(title)}</title>\n"
         f'<meta name="description" content="{attr(description)}">\n'
         f'<link rel="canonical" href="{attr(canon)}">\n'
-        '<meta name="robots" content="index,follow">\n'
+        f'<meta name="robots" content="{"noindex,follow" if noindex else "index,follow"}">\n'
         f"{yv_meta}"
         '<meta property="og:type" content="website">\n'
         f'<meta property="og:title" content="{attr(title)}">\n'
@@ -827,6 +843,8 @@ def write_sitemap(cfg: dict, pages: list[dict]) -> None:
     dates = content_lastmod()
     urls = []
     for page in pages:
+        if (page["path"] if page["path"].endswith("/") else page["path"] + "/") in NOINDEX:
+            continue
         loc = base + page["path"]
         rel = "content/" + (page["path"].strip("/") + "/" if page["path"].strip("/") else "") + "page.json"
         mod = dates.get(rel)
@@ -856,6 +874,7 @@ def main() -> None:
     cfg = load_config()
     pages = build_pages_list()
     check_no_orphans(pages)
+    collect_noindex(pages)
 
     reset_public_dir()
     PUBLIC_ASSETS.mkdir(parents=True)
@@ -892,6 +911,7 @@ def main() -> None:
             crumbs=crumbs,
             main_html=main_html,
             extras_ld=extras_ld,
+            noindex=(path if path.endswith("/") else path + "/") in NOINDEX,
         )
         out_dir = PUBLIC if path == "/" else PUBLIC / path.strip("/")
         out_dir.mkdir(parents=True, exist_ok=True)
