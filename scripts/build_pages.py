@@ -578,7 +578,7 @@ def standard_related_html(page: dict, depth: int) -> str:
             blocks.append(render_related("Другие страницы в этом разделе", leaf_links, depth))
         subs = SUBLEAVES.get((silo, hub, leaf), [])
         if subs:
-            sub_links = [(LABELS[s], f"/{silo}/{hub}/{leaf}/{s}/") for s in subs]
+            sub_links = [(LABELS[s], f"/{silo}/{hub}/{leaf}/{s}/") for s in subs if f"/{silo}/{hub}/{leaf}/{s}/" not in NOINDEX]
             blocks.append(render_related("Углубитесь в тему", sub_links, depth))
 
     elif kind == "sub":
@@ -587,11 +587,11 @@ def standard_related_html(page: dict, depth: int) -> str:
         if not leaf or not sub:
             return "".join(blocks)
         subs = SUBLEAVES.get((silo, hub, leaf), [])
-        sub_links = [(LABELS[s], f"/{silo}/{hub}/{leaf}/{s}/") for s in subs if s != sub]
+        sub_links = [(LABELS[s], f"/{silo}/{hub}/{leaf}/{s}/") for s in subs if s != sub and f"/{silo}/{hub}/{leaf}/{s}/" not in NOINDEX]
         if sub_links:
             blocks.append(render_related("Другие материалы по этой теме", sub_links, depth))
         leaves_list = LEAVES.get((silo, hub), [])
-        leaf_links = [(LABELS[l], f"/{silo}/{hub}/{l}/") for l in leaves_list if l != leaf]
+        leaf_links = [(LABELS[l], f"/{silo}/{hub}/{l}/") for l in leaves_list if l != leaf and f"/{silo}/{hub}/{l}/" not in NOINDEX]
         if leaf_links:
             blocks.append(render_related("Другие страницы в этом разделе", leaf_links, depth))
 
