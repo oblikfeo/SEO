@@ -96,6 +96,7 @@ LEAVES = {
         "sota-vpn",
         "byedpi",
         "super-vpn",
+        "hiro-vpn",
     ],
 }
 
@@ -152,6 +153,7 @@ LEAF_DESC = {
     "sota-vpn": "Sota Connect: как скачать официально и где взять ключ.",
     "byedpi": "ByeDPI и GoodbyeDPI: обход DPI без VPN.",
     "super-vpn": "Несколько приложений под одним именем и утечка 2023 года.",
+    "hiro-vpn": "Hiro VPN: где скачать официально, что даёт бесплатно и работает ли в России.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -274,6 +276,7 @@ LABELS = {
     "sota-vpn": "Sota VPN",
     "byedpi": "ByeDPI",
     "super-vpn": "Super VPN",
+    "hiro-vpn": "Hiro VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",

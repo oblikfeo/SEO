@@ -518,6 +518,19 @@ def render_trial(cfg: dict, slug: str, variant: str = "") -> str:
             "</div>"
             "</aside>"
         )
+    if variant == "site":
+        # бренд-страницы (решение пользователя 13.11.2026): человек в браузере, Telegram может не открываться —
+        # ведём на главную кабинета с UTM, тест там оформляется обычной регистрацией
+        q = urlencode({"utm_source": cfg["utm_source"], "utm_medium": cfg["utm_medium"], "utm_campaign": slug})
+        home = cfg["base_url"].rstrip("/") + "/?" + q
+        return (
+            '<aside class="lp-trial-block">'
+            "<h2>Проверьте Надежду VPN бесплатно</h2>"
+            "<p>8 часов полного доступа без карты: зарегистрируйтесь на сайте, подтвердите почту, и ключ появится "
+            "в личном кабинете. Добавьте его в Happ и сравните на своём операторе.</p>"
+            f'<a class="lp-btn-primary" href="{attr(home)}" data-page="{attr(slug)}-trial-site">Попробовать бесплатно</a>'
+            "</aside>"
+        )
     reg = register_url(cfg, slug)
     return (
         '<aside class="lp-trial-block">'
