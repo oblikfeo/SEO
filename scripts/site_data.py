@@ -97,6 +97,7 @@ LEAVES = {
         "byedpi",
         "super-vpn",
         "hiro-vpn",
+        "lagom-vpn",
     ],
 }
 
@@ -154,6 +155,7 @@ LEAF_DESC = {
     "byedpi": "ByeDPI и GoodbyeDPI: обход DPI без VPN.",
     "super-vpn": "Несколько приложений под одним именем и утечка 2023 года.",
     "hiro-vpn": "Hiro VPN: где скачать официально, что даёт бесплатно и работает ли в России.",
+    "lagom-vpn": "Lagom VPN: цена, бесплатный тариф и работает ли в России.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -277,6 +279,7 @@ LABELS = {
     "byedpi": "ByeDPI",
     "super-vpn": "Super VPN",
     "hiro-vpn": "Hiro VPN",
+    "lagom-vpn": "Lagom VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
