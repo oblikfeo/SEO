@@ -99,6 +99,7 @@ LEAVES = {
         "hiro-vpn",
         "lagom-vpn",
         "pipl-vpn",
+        "vpn-speed",
     ],
 }
 
@@ -158,6 +159,7 @@ LEAF_DESC = {
     "hiro-vpn": "Hiro VPN: где скачать официально, что даёт бесплатно и работает ли в России.",
     "lagom-vpn": "Lagom VPN: цена, бесплатный тариф и работает ли в России.",
     "pipl-vpn": "Pipl VPN: тарифы, пробный период и работает ли в России.",
+    "vpn-speed": "VPN Speed (SpeedTop VPN): что это, бесплатно и отзывы.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -283,6 +285,7 @@ LABELS = {
     "hiro-vpn": "Hiro VPN",
     "lagom-vpn": "Lagom VPN",
     "pipl-vpn": "Pipl VPN",
+    "vpn-speed": "VPN Speed",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
