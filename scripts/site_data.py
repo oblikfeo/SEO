@@ -101,6 +101,7 @@ LEAVES = {
         "pipl-vpn",
         "vpn-speed",
         "tuman-vpn",
+        "happy-vpn",
     ],
 }
 
@@ -162,6 +163,7 @@ LEAF_DESC = {
     "pipl-vpn": "Pipl VPN: тарифы, пробный период и работает ли в России.",
     "vpn-speed": "VPN Speed (SpeedTop VPN): что это, бесплатно и отзывы.",
     "tuman-vpn": "Туман VPN: отзывы, безопасность и стоит ли доверять.",
+    "happy-vpn": "Happy VPN: разбираем сайты, цены и путаницу с Happ.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -289,6 +291,7 @@ LABELS = {
     "pipl-vpn": "Pipl VPN",
     "vpn-speed": "VPN Speed",
     "tuman-vpn": "Туман VPN",
+    "happy-vpn": "Happy VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
