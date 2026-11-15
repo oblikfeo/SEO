@@ -100,6 +100,7 @@ LEAVES = {
         "lagom-vpn",
         "pipl-vpn",
         "vpn-speed",
+        "tuman-vpn",
     ],
 }
 
@@ -160,6 +161,7 @@ LEAF_DESC = {
     "lagom-vpn": "Lagom VPN: цена, бесплатный тариф и работает ли в России.",
     "pipl-vpn": "Pipl VPN: тарифы, пробный период и работает ли в России.",
     "vpn-speed": "VPN Speed (SpeedTop VPN): что это, бесплатно и отзывы.",
+    "tuman-vpn": "Туман VPN: отзывы, безопасность и стоит ли доверять.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -286,6 +288,7 @@ LABELS = {
     "lagom-vpn": "Lagom VPN",
     "pipl-vpn": "Pipl VPN",
     "vpn-speed": "VPN Speed",
+    "tuman-vpn": "Туман VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
