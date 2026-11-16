@@ -105,6 +105,7 @@ LEAVES = {
         "vpn-master",
         "fusvob-vpn",
         "medved-vpn",
+        "whale-vpn",
     ],
 }
 
@@ -170,6 +171,7 @@ LEAF_DESC = {
     "vpn-master": "VPN Master: много разных приложений под одним именем.",
     "fusvob-vpn": "Fusvob VPN: отзывы, подписка и проблемы 2026.",
     "medved-vpn": "Медведь VPN: что это, сколько стоит и почему два названия.",
+    "whale-vpn": "Whale VPN: не бренд, а одно из шаблонных названий VPN-ферм.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -301,6 +303,7 @@ LABELS = {
     "vpn-master": "VPN Master",
     "fusvob-vpn": "Fusvob VPN",
     "medved-vpn": "Медведь VPN",
+    "whale-vpn": "Whale VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
