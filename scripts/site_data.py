@@ -106,6 +106,7 @@ LEAVES = {
         "fusvob-vpn",
         "medved-vpn",
         "whale-vpn",
+        "oko-vpn",
     ],
 }
 
@@ -172,6 +173,7 @@ LEAF_DESC = {
     "fusvob-vpn": "Fusvob VPN: отзывы, подписка и проблемы 2026.",
     "medved-vpn": "Медведь VPN: что это, сколько стоит и почему два названия.",
     "whale-vpn": "Whale VPN: не бренд, а одно из шаблонных названий VPN-ферм.",
+    "oko-vpn": "OKO VPN: отзывы, пробный период и что ломается после оплаты.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -304,6 +306,7 @@ LABELS = {
     "fusvob-vpn": "Fusvob VPN",
     "medved-vpn": "Медведь VPN",
     "whale-vpn": "Whale VPN",
+    "oko-vpn": "OKO VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
