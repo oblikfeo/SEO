@@ -104,6 +104,7 @@ LEAVES = {
         "happy-vpn",
         "vpn-master",
         "fusvob-vpn",
+        "medved-vpn",
     ],
 }
 
@@ -168,6 +169,7 @@ LEAF_DESC = {
     "happy-vpn": "Happy VPN: разбираем сайты, цены и путаницу с Happ.",
     "vpn-master": "VPN Master: много разных приложений под одним именем.",
     "fusvob-vpn": "Fusvob VPN: отзывы, подписка и проблемы 2026.",
+    "medved-vpn": "Медведь VPN: что это, сколько стоит и почему два названия.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -298,6 +300,7 @@ LABELS = {
     "happy-vpn": "Happy VPN",
     "vpn-master": "VPN Master",
     "fusvob-vpn": "Fusvob VPN",
+    "medved-vpn": "Медведь VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
