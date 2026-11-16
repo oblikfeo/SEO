@@ -108,6 +108,7 @@ LEAVES = {
         "whale-vpn",
         "oko-vpn",
         "aimens-vpn",
+        "kola-vpn",
     ],
 }
 
@@ -176,6 +177,7 @@ LEAF_DESC = {
     "whale-vpn": "Whale VPN: не бренд, а одно из шаблонных названий VPN-ферм.",
     "oko-vpn": "OKO VPN: отзывы, пробный период и что ломается после оплаты.",
     "aimens-vpn": "Aimens VPN: один платный сервис и три посторонних приложения под тем же именем.",
+    "kola-vpn": "Кола VPN: тапалка, ключ для Happ и тарифы ColaVPN без юрлица.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -310,6 +312,7 @@ LABELS = {
     "whale-vpn": "Whale VPN",
     "oko-vpn": "OKO VPN",
     "aimens-vpn": "Aimens VPN",
+    "kola-vpn": "Кола VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
