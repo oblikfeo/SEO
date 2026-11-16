@@ -112,6 +112,7 @@ LEAVES = {
         "bye-vpn",
         "buba-vpn",
         "pingvin-vpn",
+        "vpn-me",
     ],
 }
 
@@ -184,6 +185,7 @@ LEAF_DESC = {
     "bye-vpn": "Bye VPN: отдельное приложение или опечатка в поиске ByeDPI.",
     "buba-vpn": "Буба VPN: два разных сервиса под одним именем.",
     "pingvin-vpn": "Пингвин VPN: на самом деле Ping VPN — 10 млн установок и жалобы.",
+    "vpn-me": "VPN Me: заявка «без логов» против собственной карточки Google Play.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -322,6 +324,7 @@ LABELS = {
     "bye-vpn": "Bye VPN",
     "buba-vpn": "Буба VPN",
     "pingvin-vpn": "Пингвин VPN",
+    "vpn-me": "VPN Me",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
