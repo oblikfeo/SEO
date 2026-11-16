@@ -111,6 +111,7 @@ LEAVES = {
         "kola-vpn",
         "bye-vpn",
         "buba-vpn",
+        "pingvin-vpn",
     ],
 }
 
@@ -182,6 +183,7 @@ LEAF_DESC = {
     "kola-vpn": "Кола VPN: тапалка, ключ для Happ и тарифы ColaVPN без юрлица.",
     "bye-vpn": "Bye VPN: отдельное приложение или опечатка в поиске ByeDPI.",
     "buba-vpn": "Буба VPN: два разных сервиса под одним именем.",
+    "pingvin-vpn": "Пингвин VPN: на самом деле Ping VPN — 10 млн установок и жалобы.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -319,6 +321,7 @@ LABELS = {
     "kola-vpn": "Кола VPN",
     "bye-vpn": "Bye VPN",
     "buba-vpn": "Буба VPN",
+    "pingvin-vpn": "Пингвин VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
