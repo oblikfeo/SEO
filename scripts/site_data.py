@@ -107,6 +107,7 @@ LEAVES = {
         "medved-vpn",
         "whale-vpn",
         "oko-vpn",
+        "aimens-vpn",
     ],
 }
 
@@ -174,6 +175,7 @@ LEAF_DESC = {
     "medved-vpn": "Медведь VPN: что это, сколько стоит и почему два названия.",
     "whale-vpn": "Whale VPN: не бренд, а одно из шаблонных названий VPN-ферм.",
     "oko-vpn": "OKO VPN: отзывы, пробный период и что ломается после оплаты.",
+    "aimens-vpn": "Aimens VPN: один платный сервис и три посторонних приложения под тем же именем.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -307,6 +309,7 @@ LABELS = {
     "medved-vpn": "Медведь VPN",
     "whale-vpn": "Whale VPN",
     "oko-vpn": "OKO VPN",
+    "aimens-vpn": "Aimens VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
