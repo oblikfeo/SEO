@@ -103,6 +103,7 @@ LEAVES = {
         "tuman-vpn",
         "happy-vpn",
         "vpn-master",
+        "fusvob-vpn",
     ],
 }
 
@@ -166,6 +167,7 @@ LEAF_DESC = {
     "tuman-vpn": "Туман VPN: отзывы, безопасность и стоит ли доверять.",
     "happy-vpn": "Happy VPN: разбираем сайты, цены и путаницу с Happ.",
     "vpn-master": "VPN Master: много разных приложений под одним именем.",
+    "fusvob-vpn": "Fusvob VPN: отзывы, подписка и проблемы 2026.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -295,6 +297,7 @@ LABELS = {
     "tuman-vpn": "Туман VPN",
     "happy-vpn": "Happy VPN",
     "vpn-master": "VPN Master",
+    "fusvob-vpn": "Fusvob VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
