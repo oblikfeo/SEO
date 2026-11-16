@@ -102,6 +102,7 @@ LEAVES = {
         "vpn-speed",
         "tuman-vpn",
         "happy-vpn",
+        "vpn-master",
     ],
 }
 
@@ -164,6 +165,7 @@ LEAF_DESC = {
     "vpn-speed": "VPN Speed (SpeedTop VPN): что это, бесплатно и отзывы.",
     "tuman-vpn": "Туман VPN: отзывы, безопасность и стоит ли доверять.",
     "happy-vpn": "Happy VPN: разбираем сайты, цены и путаницу с Happ.",
+    "vpn-master": "VPN Master: много разных приложений под одним именем.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -292,6 +294,7 @@ LABELS = {
     "vpn-speed": "VPN Speed",
     "tuman-vpn": "Туман VPN",
     "happy-vpn": "Happy VPN",
+    "vpn-master": "VPN Master",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
