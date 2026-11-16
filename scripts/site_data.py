@@ -109,6 +109,7 @@ LEAVES = {
         "oko-vpn",
         "aimens-vpn",
         "kola-vpn",
+        "bye-vpn",
     ],
 }
 
@@ -178,6 +179,7 @@ LEAF_DESC = {
     "oko-vpn": "OKO VPN: отзывы, пробный период и что ломается после оплаты.",
     "aimens-vpn": "Aimens VPN: один платный сервис и три посторонних приложения под тем же именем.",
     "kola-vpn": "Кола VPN: тапалка, ключ для Happ и тарифы ColaVPN без юрлица.",
+    "bye-vpn": "Bye VPN: отдельное приложение или опечатка в поиске ByeDPI.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -313,6 +315,7 @@ LABELS = {
     "oko-vpn": "OKO VPN",
     "aimens-vpn": "Aimens VPN",
     "kola-vpn": "Кола VPN",
+    "bye-vpn": "Bye VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
