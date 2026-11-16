@@ -110,6 +110,7 @@ LEAVES = {
         "aimens-vpn",
         "kola-vpn",
         "bye-vpn",
+        "buba-vpn",
     ],
 }
 
@@ -180,6 +181,7 @@ LEAF_DESC = {
     "aimens-vpn": "Aimens VPN: один платный сервис и три посторонних приложения под тем же именем.",
     "kola-vpn": "Кола VPN: тапалка, ключ для Happ и тарифы ColaVPN без юрлица.",
     "bye-vpn": "Bye VPN: отдельное приложение или опечатка в поиске ByeDPI.",
+    "buba-vpn": "Буба VPN: два разных сервиса под одним именем.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -316,6 +318,7 @@ LABELS = {
     "aimens-vpn": "Aimens VPN",
     "kola-vpn": "Кола VPN",
     "bye-vpn": "Bye VPN",
+    "buba-vpn": "Буба VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
