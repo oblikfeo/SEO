@@ -115,6 +115,7 @@ LEAVES = {
         "vpn-me",
         "red-shield-vpn",
         "portal-vpn",
+        "lvcha-vpn",
     ],
 }
 
@@ -190,6 +191,7 @@ LEAF_DESC = {
     "vpn-me": "VPN Me: заявка «без логов» против собственной карточки Google Play.",
     "red-shield-vpn": "Red Shield VPN: «безлимит» в рекламе и лимит 1 ТБ в условиях.",
     "portal-vpn": "Portal VPN: три разных сервиса и возврат, который почти невозможен.",
+    "lvcha-vpn": "Lvcha VPN: настоящий сайт и клон, где скачивание ведёт на другой сервис.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -331,6 +333,7 @@ LABELS = {
     "vpn-me": "VPN Me",
     "red-shield-vpn": "Red Shield VPN",
     "portal-vpn": "Portal VPN",
+    "lvcha-vpn": "Lvcha VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
