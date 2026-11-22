@@ -114,6 +114,7 @@ LEAVES = {
         "pingvin-vpn",
         "vpn-me",
         "red-shield-vpn",
+        "portal-vpn",
     ],
 }
 
@@ -188,6 +189,7 @@ LEAF_DESC = {
     "pingvin-vpn": "Пингвин VPN: на самом деле Ping VPN — 10 млн установок и жалобы.",
     "vpn-me": "VPN Me: заявка «без логов» против собственной карточки Google Play.",
     "red-shield-vpn": "Red Shield VPN: «безлимит» в рекламе и лимит 1 ТБ в условиях.",
+    "portal-vpn": "Portal VPN: три разных сервиса и возврат, который почти невозможен.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -328,6 +330,7 @@ LABELS = {
     "pingvin-vpn": "Пингвин VPN",
     "vpn-me": "VPN Me",
     "red-shield-vpn": "Red Shield VPN",
+    "portal-vpn": "Portal VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
