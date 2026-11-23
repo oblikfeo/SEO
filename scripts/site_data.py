@@ -118,6 +118,7 @@ LEAVES = {
         "portal-vpn",
         "lvcha-vpn",
         "avo-vpn",
+        "pipster-vpn",
     ],
 }
 
@@ -195,6 +196,7 @@ LEAF_DESC = {
     "portal-vpn": "Portal VPN: три разных сервиса и возврат, который почти невозможен.",
     "lvcha-vpn": "Lvcha VPN: настоящий сайт и клон, где скачивание ведёт на другой сервис.",
     "avo-vpn": "avoVPN: клиент без своего сервиса и личного кабинета.",
+    "pipster-vpn": "Pipster VPN: реальное юрлицо и сайт, который не открывается.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -338,6 +340,7 @@ LABELS = {
     "portal-vpn": "Portal VPN",
     "lvcha-vpn": "Lvcha VPN",
     "avo-vpn": "avoVPN",
+    "pipster-vpn": "Pipster VPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
