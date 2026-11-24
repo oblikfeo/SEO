@@ -44,7 +44,7 @@ ASSETS_ROOT = ROOT / "assets"
 PUBLIC = Path(os.environ.get("SEO_PUBLIC_DIR") or ROOT / "public")
 PUBLIC_ASSETS = PUBLIC / "assets" / "css"
 
-FAVICON_FILES = ["favicon.ico", "gemini-svg.svg"]
+FAVICON_FILES = ["favicon.ico", "gemini-svg.svg", "e2d1c44bbf7148e4bebbd2ecef4744dd.txt"]
 
 CSS_FILES = [
     "tokens.css",
