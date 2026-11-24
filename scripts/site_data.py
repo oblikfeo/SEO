@@ -119,6 +119,7 @@ LEAVES = {
         "lvcha-vpn",
         "avo-vpn",
         "pipster-vpn",
+        "run-vpn",
     ],
 }
 
@@ -197,6 +198,7 @@ LEAF_DESC = {
     "lvcha-vpn": "Lvcha VPN: настоящий сайт и клон, где скачивание ведёт на другой сервис.",
     "avo-vpn": "avoVPN: клиент без своего сервиса и личного кабинета.",
     "pipster-vpn": "Pipster VPN: реальное юрлицо и сайт, который не открывается.",
+    "run-vpn": "RunVPN: честная политика конфиденциальности против карточки Google Play.",
     "apk": "Безопасный APK для Android из официальных источников.",
     "gaming": "VPN для мобильных игр на Android.",
 }
@@ -341,6 +343,7 @@ LABELS = {
     "lvcha-vpn": "Lvcha VPN",
     "avo-vpn": "avoVPN",
     "pipster-vpn": "Pipster VPN",
+    "run-vpn": "RunVPN",
     # Блог
     "russian-vpn": "Русский VPN",
     "amnezia-setup": "Амнезия VPN: настройка",
